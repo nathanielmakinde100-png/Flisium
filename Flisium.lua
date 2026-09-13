@@ -27,11 +27,11 @@ ClickSound = "rbxassetid://116080744084010",
 HoverSound = "rbxassetid://139800881181209",
 CloseSound = "rbxassetid://8968249849",
 
-Width = 780,
-Height = 500,
+Width = 720,
+Height = 520,
 
-MinWidth = 620,
-MinHeight = 420,
+MinWidth = 600,
+MinHeight = 400,
 }
 
 --==================================================
@@ -48,24 +48,24 @@ end
 --==================================================
 
 local C = {
-Black = Color3.fromRGB(4, 7, 18),
-Panel = Color3.fromRGB(7, 12, 30),
-Panel2 = Color3.fromRGB(10, 18, 42),
-Panel3 = Color3.fromRGB(15, 28, 62),
+Black = Color3.fromRGB(7, 8, 8),
+Panel = Color3.fromRGB(13, 15, 14),
+Panel2 = Color3.fromRGB(20, 23, 21),
+Panel3 = Color3.fromRGB(30, 35, 31),
 
-White = Color3.fromRGB(245, 248, 255),
-Muted = Color3.fromRGB(155, 171, 205),
-Dim = Color3.fromRGB(83, 103, 145),
+White = Color3.fromRGB(232, 236, 232),
+Muted = Color3.fromRGB(155, 163, 156),
+Dim = Color3.fromRGB(92, 101, 94),
 
-Border = Color3.fromRGB(35, 61, 112),
+Border = Color3.fromRGB(55, 61, 56),
 
-Accent = Color3.fromRGB(45, 105, 255), -- Royal blue
-AccentDark = Color3.fromRGB(28, 68, 170),
-Cyan = Color3.fromRGB(42, 224, 255),
-Violet = Color3.fromRGB(139, 92, 246),
-Magenta = Color3.fromRGB(236, 72, 153),
+Accent = Color3.fromRGB(95, 190, 105),
+AccentDark = Color3.fromRGB(42, 100, 49),
+Cyan = Color3.fromRGB(112, 205, 122),
+Violet = Color3.fromRGB(125, 135, 128),
+Magenta = Color3.fromRGB(170, 180, 172),
 
-Red = Color3.fromRGB(255, 75, 95),
+Red = Color3.fromRGB(215, 80, 85),
 }
 
 --==================================================
@@ -181,22 +181,6 @@ ClipsDescendants = true,
 
 Round(Main, 12)
 local MainStroke = Stroke(Main, C.Border, 0, 1)
-local Ambient = Instance.new("UIGradient")
-Ambient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, C.Panel),
-    ColorSequenceKeypoint.new(0.5, C.Panel2),
-    ColorSequenceKeypoint.new(1, C.Panel)
-})
-Ambient.Rotation = 25
-Ambient.Parent = Main
-
-task.spawn(function()
-    while Main.Parent do
-        Tween(Ambient, TweenInfo.new(5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Rotation = 205}).Completed:Wait()
-        Tween(Ambient, TweenInfo.new(5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Rotation = 25}).Completed:Wait()
-    end
-end)
-
 
 -- Shadow
 local Shadow = Create("ImageLabel", {
@@ -252,7 +236,7 @@ end)
 
 local Header = Create("Frame", {
 Name = "Header",
-Size = UDim2.new(1, 0, 0, 64),
+Size = UDim2.new(1, 0, 0, 36),
 BackgroundColor3 = C.Panel,
 BorderSizePixel = 0,
 ZIndex = 20,
@@ -262,8 +246,8 @@ local Logo = Create("ImageLabel", {
 Name = "Logo",
 BackgroundTransparency = 1,
 Image = CONFIG.Logo,
-Size = UDim2.fromOffset(34, 34),
-Position = UDim2.fromOffset(18, 15),
+Size = UDim2.fromOffset(18, 18),
+Position = UDim2.fromOffset(10, 9),
 ZIndex = 22,
 }, Header)
 
@@ -272,24 +256,24 @@ Round(Logo, 7)
 local Title = Create("TextLabel", {
 BackgroundTransparency = 1,
 Text = "FLISIUM",
-Font = Enum.Font.GothamBold,
-TextSize = 16,
+Font = Enum.Font.Code,
+TextSize = 13,
 TextColor3 = C.White,
 TextXAlignment = Enum.TextXAlignment.Left,
-Size = UDim2.fromOffset(180, 22),
-Position = UDim2.fromOffset(63, 12),
+Size = UDim2.fromOffset(150, 18),
+Position = UDim2.fromOffset(35, 8),
 ZIndex = 22,
 }, Header)
 
 local Subtitle = Create("TextLabel", {
 BackgroundTransparency = 1,
 Text = "CONTROL PANEL",
-Font = Enum.Font.GothamMedium,
-TextSize = 9,
+Font = Enum.Font.Code,
+TextSize = 8,
 TextColor3 = C.Muted,
 TextXAlignment = Enum.TextXAlignment.Left,
-Size = UDim2.fromOffset(180, 15),
-Position = UDim2.fromOffset(64, 34),
+Size = UDim2.fromOffset(160, 12),
+Position = UDim2.fromOffset(36, 22),
 ZIndex = 22,
 }, Header)
 
@@ -302,11 +286,11 @@ local button = Create("TextButton", {
 BackgroundColor3 = C.Panel2,
 BackgroundTransparency = 0,
 Text = text,
-Font = Enum.Font.GothamMedium,
+Font = Enum.Font.Code,
 TextSize = 13,
 TextColor3 = C.Muted,
 AutoButtonColor = false,
-Size = UDim2.fromOffset(32, 32),
+Size = UDim2.fromOffset(26, 26),
 Position = position,
 ZIndex = 25,
 }, Header)
@@ -334,9 +318,9 @@ end)
 return button
 end
 
-local MinButton = CreateWindowButton("—", UDim2.new(1, -112, 0, 16))
-local MaxButton = CreateWindowButton("□", UDim2.new(1, -74, 0, 16))
-local CloseButton = CreateWindowButton("×", UDim2.new(1, -36, 0, 16))
+local MinButton = CreateWindowButton("-", UDim2.new(1, -92, 0, 5))
+local MaxButton = CreateWindowButton("+", UDim2.new(1, -62, 0, 5))
+local CloseButton = CreateWindowButton("x", UDim2.new(1, -32, 0, 5))
 local function AddButtonGlow(button, color)
     local stroke = button:FindFirstChildOfClass("UIStroke")
     if stroke then
@@ -356,6 +340,62 @@ end
 AddButtonGlow(MinButton, C.Cyan)
 AddButtonGlow(MaxButton, C.Violet)
 AddButtonGlow(CloseButton, C.Magenta)
+
+--==================================================
+-- REFERENCE-STYLE STATUS STRIP
+--==================================================
+
+ClockTab = Create("Frame", {
+    Name = "ClockTab",
+    BackgroundColor3 = C.Black,
+    BorderSizePixel = 0,
+    Size = UDim2.fromOffset(430, 22),
+    Position = UDim2.fromOffset(0, 0),
+    Visible = true,
+    ZIndex = 100,
+}, Gui)
+Stroke(ClockTab, C.Border, 0.15, 1)
+
+local ClockLogo = Create("ImageLabel", {
+    BackgroundTransparency = 1,
+    Image = CONFIG.Logo,
+    Size = UDim2.fromOffset(13, 13),
+    Position = UDim2.fromOffset(7, 4),
+    ZIndex = 101,
+}, ClockTab)
+
+local ClockBrand = Create("TextLabel", {
+    BackgroundTransparency = 1,
+    Text = "flisium",
+    Font = Enum.Font.Code,
+    TextSize = 10,
+    TextColor3 = C.White,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    Size = UDim2.fromOffset(100, 18),
+    Position = UDim2.fromOffset(26, 2),
+    ZIndex = 101,
+}, ClockTab)
+
+ClockText = Create("TextLabel", {
+    BackgroundTransparency = 1,
+    Text = "-- fps  •  --/--/----",
+    Font = Enum.Font.Code,
+    TextSize = 9,
+    TextColor3 = C.Muted,
+    TextXAlignment = Enum.TextXAlignment.Right,
+    Size = UDim2.new(1, -138, 0, 18),
+    Position = UDim2.fromOffset(130, 2),
+    ZIndex = 101,
+}, ClockTab)
+
+-- Keep the strip attached to the window while dragging/resizing.
+task.spawn(function()
+    while Gui.Parent do
+        local pos = Main.AbsolutePosition
+        ClockTab.Position = UDim2.fromOffset(pos.X, math.max(0, pos.Y - 23))
+        task.wait(0.05)
+    end
+end)
 
 --==================================================
 -- DRAGGING
@@ -449,11 +489,12 @@ UDim2.new(0, 8, 1, -8)
 
 local Sidebar = Create("Frame", {
 Name = "Sidebar",
-Size = UDim2.fromOffset(178, CONFIG.Height - 64),
-Position = UDim2.fromOffset(0, 64),
-BackgroundColor3 = C.Panel,
+Size = UDim2.fromOffset(0, 0),
+Position = UDim2.fromOffset(0, 0),
+BackgroundTransparency = 1,
 BorderSizePixel = 0,
-ZIndex = 15,
+Visible = false,
+ZIndex = 1,
 }, Main)
 
 local SidebarLine = Create("Frame", {
@@ -466,13 +507,16 @@ ZIndex = 18,
 
 local TabContainer = Create("Frame", {
 BackgroundTransparency = 1,
-Size = UDim2.new(1, -20, 1, -100),
-Position = UDim2.fromOffset(10, 20),
-ZIndex = 20,
-}, Sidebar)
+Size = UDim2.new(1, -16, 0, 28),
+Position = UDim2.fromOffset(8, 36),
+ZIndex = 40,
+}, Main)
 
 Create("UIListLayout", {
-Padding = UDim.new(0, 7),
+Padding = UDim.new(0, 2),
+FillDirection = Enum.FillDirection.Horizontal,
+HorizontalAlignment = Enum.HorizontalAlignment.Left,
+VerticalAlignment = Enum.VerticalAlignment.Center,
 SortOrder = Enum.SortOrder.LayoutOrder,
 }, TabContainer)
 
@@ -493,8 +537,8 @@ local Pages = {}
 
 local Content = Create("Frame", {
 Name = "Content",
-Size = UDim2.new(1, -178, 1, -64),
-Position = UDim2.fromOffset(178, 64),
+Size = UDim2.new(1, 0, 1, -64),
+Position = UDim2.fromOffset(0, 64),
 BackgroundColor3 = C.Black,
 BorderSizePixel = 0,
 ZIndex = 14,
@@ -505,14 +549,14 @@ for _, tabName in ipairs(Tabs) do
 local Page = Create("ScrollingFrame", {
 Name = tabName,
 BackgroundTransparency = 1,
-Size = UDim2.new(1, -28, 1, -28),
-Position = UDim2.fromOffset(14, 14),
+Size = UDim2.new(1, -16, 1, -10),
+Position = UDim2.fromOffset(8, 5),
 
 CanvasSize = UDim2.fromOffset(0, 0),
 AutomaticCanvasSize = Enum.AutomaticSize.Y,
 
-ScrollBarThickness = 2,
-ScrollBarImageColor3 = C.AccentDark,
+ScrollBarThickness = 1,
+ScrollBarImageColor3 = C.Accent,
 ScrollBarImageTransparency = 0.25,
 
 BorderSizePixel = 0,
@@ -558,28 +602,28 @@ local button = Create("TextButton", {
 Name = tabName,
 BackgroundColor3 = C.Panel,
 Text = tabName,
-Font = Enum.Font.GothamMedium,
-TextSize = 12,
+Font = Enum.Font.Code,
+TextSize = 10,
 TextColor3 = C.Muted,
 
 AutoButtonColor = false,
 
-Size = UDim2.new(1, 0, 0, 40),
+Size = UDim2.fromOffset(82, 26),
 
 LayoutOrder = index,
-ZIndex = 21,
+ZIndex = 41,
 }, TabContainer)
 
 Round(button, 6)
 
 local indicator = Create("Frame", {
 Name = "Indicator",
-BackgroundColor3 = C.Cyan,
+BackgroundColor3 = C.Accent,
 BackgroundTransparency = 1,
 BorderSizePixel = 0,
-Size = UDim2.fromOffset(3, 22),
-Position = UDim2.new(0, 0, 0.5, -9),
-ZIndex = 23,
+Size = UDim2.new(1, 0, 0, 2),
+Position = UDim2.new(0, 0, 1, -2),
+ZIndex = 43,
 }, button)
 
 button.MouseEnter:Connect(function()
@@ -634,7 +678,7 @@ Round(StatusDot, 50)
 local StatusText = Create("TextLabel", {
 BackgroundTransparency = 1,
 Text = "SYSTEM ONLINE • FLISIUM",
-Font = Enum.Font.GothamMedium,
+Font = Enum.Font.Code,
 TextSize = 9,
 TextColor3 = C.Muted,
 TextXAlignment = Enum.TextXAlignment.Left,
@@ -645,8 +689,8 @@ ZIndex = 22,
 
 local VersionText = Create("TextLabel", {
 BackgroundTransparency = 1,
-Text = "ROYAL BLUE EDITION // CLIENT",
-Font = Enum.Font.Gotham,
+Text = "GREEN / GREY / BLACK // CLIENT",
+Font = Enum.Font.Code,
 TextSize = 8,
 TextColor3 = C.Dim,
 TextXAlignment = Enum.TextXAlignment.Left,
@@ -663,30 +707,30 @@ local function PageHeader(page, title, description)
 
 local holder = Create("Frame", {
 BackgroundTransparency = 1,
-Size = UDim2.new(1, -10, 0, 65),
-Position = UDim2.fromOffset(5, 3),
+Size = UDim2.new(1, -10, 0, 48),
+Position = UDim2.fromOffset(5, 2),
 }, page)
 
 Create("TextLabel", {
 BackgroundTransparency = 1,
 Text = title,
-Font = Enum.Font.GothamBold,
-TextSize = 22,
+Font = Enum.Font.Code,
+TextSize = 16,
 TextColor3 = C.White,
 TextXAlignment = Enum.TextXAlignment.Left,
-Size = UDim2.new(1, 0, 0, 30),
+Size = UDim2.new(1, 0, 0, 22),
 Position = UDim2.fromOffset(0, 0),
 }, holder)
 
 Create("TextLabel", {
 BackgroundTransparency = 1,
 Text = description,
-Font = Enum.Font.Gotham,
+Font = Enum.Font.Code,
 TextSize = 10,
 TextColor3 = C.Muted,
 TextXAlignment = Enum.TextXAlignment.Left,
-Size = UDim2.new(1, 0, 0, 20),
-Position = UDim2.fromOffset(0, 32),
+Size = UDim2.new(1, 0, 0, 15),
+Position = UDim2.fromOffset(0, 23),
 }, holder)
 
 return holder
@@ -697,7 +741,7 @@ local function CreateSectionLabel(page, text, y)
 return Create("TextLabel", {
 BackgroundTransparency = 1,
 Text = string.upper(text),
-Font = Enum.Font.GothamBold,
+Font = Enum.Font.Code,
 TextSize = 9,
 TextColor3 = C.Dim,
 TextXAlignment = Enum.TextXAlignment.Left,
@@ -717,7 +761,7 @@ BackgroundColor3 = C.Panel2,
 BorderSizePixel = 0,
 Text = "",
 AutoButtonColor = false,
-Size = UDim2.new(1, -10, 0, 42),
+Size = UDim2.new(1, -10, 0, 34),
 Position = UDim2.fromOffset(5, y),
 ZIndex = 30,
 }, parent)
@@ -728,8 +772,8 @@ Stroke(button, C.Border, 0, 1)
 local label = Create("TextLabel", {
 BackgroundTransparency = 1,
 Text = text,
-Font = Enum.Font.GothamMedium,
-TextSize = 11,
+Font = Enum.Font.Code,
+TextSize = 10,
 TextColor3 = C.White,
 TextXAlignment = Enum.TextXAlignment.Left,
 Size = UDim2.new(1, -80, 1, 0),
@@ -740,7 +784,7 @@ ZIndex = 31,
 local toggle = Create("Frame", {
 BackgroundColor3 = C.Panel3,
 BorderSizePixel = 0,
-Size = UDim2.fromOffset(32, 16),
+Size = UDim2.fromOffset(28, 14),
 Position = UDim2.new(1, -47, 0.5, -8),
 ZIndex = 31,
 }, button)
@@ -800,7 +844,7 @@ local box = Create("TextBox", {
 BackgroundColor3 = C.Panel3,
 BorderSizePixel = 0,
 Text = tostring(value),
-Font = Enum.Font.GothamMedium,
+Font = Enum.Font.Code,
 TextSize = 10,
 TextColor3 = C.White,
 
@@ -1048,8 +1092,8 @@ local RespawnButton = Create("TextButton", {
 BackgroundColor3 = C.Panel2,
 BorderSizePixel = 0,
 Text = "RESPAWN",
-Font = Enum.Font.GothamBold,
-TextSize = 11,
+Font = Enum.Font.Code,
+TextSize = 10,
 TextColor3 = C.White,
 AutoButtonColor = false,
 Size = UDim2.new(1, -10, 0, 40),
@@ -1094,8 +1138,8 @@ Stroke(row, C.Border, 0, 1)
 Create("TextLabel", {
 BackgroundTransparency = 1,
 Text = title,
-Font = Enum.Font.GothamMedium,
-TextSize = 11,
+Font = Enum.Font.Code,
+TextSize = 10,
 TextColor3 = C.White,
 TextXAlignment = Enum.TextXAlignment.Left,
 Size = UDim2.fromOffset(150, 25),
@@ -1200,8 +1244,8 @@ Stroke(FlyRow, C.Border, 0, 1)
 Create("TextLabel", {
 BackgroundTransparency = 1,
 Text = "Fly",
-Font = Enum.Font.GothamMedium,
-TextSize = 11,
+Font = Enum.Font.Code,
+TextSize = 10,
 TextColor3 = C.White,
 TextXAlignment = Enum.TextXAlignment.Left,
 Size = UDim2.fromOffset(150, 25),
@@ -1264,8 +1308,8 @@ Stroke(InvisibleRow, C.Border, 0, 1)
 Create("TextLabel", {
 BackgroundTransparency = 1,
 Text = "Invisibility",
-Font = Enum.Font.GothamMedium,
-TextSize = 11,
+Font = Enum.Font.Code,
+TextSize = 10,
 TextColor3 = C.White,
 TextXAlignment = Enum.TextXAlignment.Left,
 Size = UDim2.fromOffset(150, 25),
@@ -1751,7 +1795,7 @@ colorSetting
 local row = Create("Frame", {
 BackgroundColor3 = C.Panel2,
 BorderSizePixel = 0,
-Size = UDim2.new(1, -10, 0, 42),
+Size = UDim2.new(1, -10, 0, 34),
 Position = UDim2.fromOffset(5, y),
 }, page)
 
@@ -1760,8 +1804,8 @@ Stroke(row, C.Border, 0, 1)
 local label = Create("TextLabel", {
 BackgroundTransparency = 1,
 Text = text,
-Font = Enum.Font.GothamMedium,
-TextSize = 11,
+Font = Enum.Font.Code,
+TextSize = 10,
 TextColor3 = C.White,
 TextXAlignment = Enum.TextXAlignment.Left,
 Size = UDim2.new(1, -160, 1, 0),
@@ -2006,7 +2050,7 @@ local name = Instance.new("TextLabel")
 
 name.Name = "Name"
 name.BackgroundTransparency = 1
-name.Font = Enum.Font.GothamBold
+name.Font = Enum.Font.Code
 name.TextSize = 11
 name.TextStrokeTransparency = 0.4
 name.Size = UDim2.new(1, 0, 0, 18)
@@ -2019,7 +2063,7 @@ local distance = Instance.new("TextLabel")
 
 distance.Name = "Distance"
 distance.BackgroundTransparency = 1
-distance.Font = Enum.Font.GothamMedium
+distance.Font = Enum.Font.Code
 distance.TextSize = 9
 distance.TextStrokeTransparency = 0.4
 distance.Size = UDim2.new(1, 0, 0, 16)
@@ -2093,7 +2137,7 @@ local function CreateArrow()
 local arrow = Create("TextLabel", {
 BackgroundTransparency = 1,
 Text = "•",
-Font = Enum.Font.GothamBold,
+Font = Enum.Font.Code,
 TextSize = 25,
 TextColor3 = C.White,
 TextStrokeTransparency = 0.2,
@@ -2585,7 +2629,7 @@ Stroke(FOVCircle, C.White, 0.15, 1)
 local FOVLabel = Create("TextLabel", {
 BackgroundTransparency = 1,
 Text = "FOV",
-Font = Enum.Font.GothamBold,
+Font = Enum.Font.Code,
 TextSize = 8,
 TextColor3 = C.Muted,
 AnchorPoint = Vector2.new(0.5, 1),
@@ -2621,8 +2665,8 @@ Stroke(row, C.Border, 0, 1)
 Create("TextLabel", {
 BackgroundTransparency = 1,
 Text = title,
-Font = Enum.Font.GothamMedium,
-TextSize = 11,
+Font = Enum.Font.Code,
+TextSize = 10,
 TextColor3 = C.White,
 TextXAlignment = Enum.TextXAlignment.Left,
 Size = UDim2.fromOffset(150, 25),
@@ -2685,7 +2729,7 @@ Stroke(AimInfo, C.Border, 0, 1)
 Create("TextLabel", {
 BackgroundTransparency = 1,
 Text = "Targeting",
-Font = Enum.Font.GothamBold,
+Font = Enum.Font.Code,
 TextSize = 12,
 TextColor3 = C.White,
 TextXAlignment = Enum.TextXAlignment.Left,
@@ -2695,7 +2739,7 @@ Position = UDim2.fromOffset(12, 9),
 Create("TextLabel", {
 BackgroundTransparency = 1,
 Text = "Shush/Silent Aim is intentionally omitted: a normal LocalScript cannot safely rewrite arbitrary weapon hit registration. Triggerbot uses Tool:Activate() when your equipped tool supports it.",
-Font = Enum.Font.Gotham,
+Font = Enum.Font.Code,
 TextSize = 9,
 TextColor3 = C.Muted,
 TextXAlignment = Enum.TextXAlignment.Left,
@@ -2807,24 +2851,24 @@ CreateSectionLabel(GamePage, "Utilities", 75)
 
 local FPSLabel = Create("TextLabel", {
 BackgroundColor3 = C.Panel2, BorderSizePixel = 0, Text = "FPS  --",
-Font = Enum.Font.GothamMedium, TextSize = 11, TextColor3 = C.White,
-TextXAlignment = Enum.TextXAlignment.Left, Size = UDim2.new(1, -10, 0, 42),
+Font = Enum.Font.Code, TextSize = 10, TextColor3 = C.White,
+TextXAlignment = Enum.TextXAlignment.Left, Size = UDim2.new(1, -10, 0, 34),
 Position = UDim2.fromOffset(5, 102),
 }, GamePage)
 Stroke(FPSLabel, C.Border, 0, 1)
 
 local PingLabel = Create("TextLabel", {
 BackgroundColor3 = C.Panel2, BorderSizePixel = 0, Text = "Server: " .. game.JobId,
-Font = Enum.Font.GothamMedium, TextSize = 10, TextColor3 = C.White,
+Font = Enum.Font.Code, TextSize = 10, TextColor3 = C.White,
 TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd,
-Size = UDim2.new(1, -10, 0, 42), Position = UDim2.fromOffset(5, 152),
+Size = UDim2.new(1, -10, 0, 34), Position = UDim2.fromOffset(5, 152),
 }, GamePage)
 Stroke(PingLabel, C.Border, 0, 1)
 
 local RejoinButton = Create("TextButton", {
 BackgroundColor3 = C.Panel2, BorderSizePixel = 0, Text = "RELOAD CHARACTER",
-Font = Enum.Font.GothamBold, TextSize = 10, TextColor3 = C.White, AutoButtonColor = false,
-Size = UDim2.new(1, -10, 0, 42), Position = UDim2.fromOffset(5, 202),
+Font = Enum.Font.Code, TextSize = 10, TextColor3 = C.White, AutoButtonColor = false,
+Size = UDim2.new(1, -10, 0, 34), Position = UDim2.fromOffset(5, 202),
 }, GamePage)
 Stroke(RejoinButton, C.Border, 0, 1)
 RejoinButton.MouseButton1Click:Connect(function()
@@ -2835,16 +2879,16 @@ end)
 
 local FullscreenButton = Create("TextButton", {
 BackgroundColor3 = C.Panel2, BorderSizePixel = 0, Text = "TOGGLE FULLSCREEN UI",
-Font = Enum.Font.GothamBold, TextSize = 10, TextColor3 = C.White, AutoButtonColor = false,
-Size = UDim2.new(1, -10, 0, 42), Position = UDim2.fromOffset(5, 252),
+Font = Enum.Font.Code, TextSize = 10, TextColor3 = C.White, AutoButtonColor = false,
+Size = UDim2.new(1, -10, 0, 34), Position = UDim2.fromOffset(5, 252),
 }, GamePage)
 Stroke(FullscreenButton, C.Border, 0, 1)
 FullscreenButton.MouseButton1Click:Connect(function()
 PlayClick()
 Maximized = not Maximized
 if Maximized then
-Main.Size = UDim2.new(0.86, 0, 0.86, 0)
-Main.Position = UDim2.new(0.07, 0, 0.07, 0)
+Main.Size = UDim2.new(0.90, 0, 0.90, 0)
+Main.Position = UDim2.new(0.05, 0, 0.05, 0)
 else
 Main.Size = NormalSize
 Main.Position = NormalPosition
@@ -2857,13 +2901,13 @@ Position = UDim2.fromOffset(5, 302),
 }, GamePage)
 Stroke(InfoBox, C.Border, 0, 1)
 Create("TextLabel", {
-BackgroundTransparency = 1, Text = "CLIENT INFO", Font = Enum.Font.GothamBold, TextSize = 10,
+BackgroundTransparency = 1, Text = "CLIENT INFO", Font = Enum.Font.Code, TextSize = 10,
 TextColor3 = C.Muted, TextXAlignment = Enum.TextXAlignment.Left,
 Size = UDim2.new(1, -24, 0, 18), Position = UDim2.fromOffset(12, 8),
 }, InfoBox)
 local ClientInfo = Create("TextLabel", {
 BackgroundTransparency = 1, Text = "Player: " .. LocalPlayer.DisplayName .. "\nUserId: " .. LocalPlayer.UserId .. "\nPlaceId: " .. game.PlaceId,
-Font = Enum.Font.GothamMedium, TextSize = 10, TextColor3 = C.White, TextXAlignment = Enum.TextXAlignment.Left,
+Font = Enum.Font.Code, TextSize = 10, TextColor3 = C.White, TextXAlignment = Enum.TextXAlignment.Left,
 Size = UDim2.new(1, -24, 0, 60), Position = UDim2.fromOffset(12, 28),
 }, InfoBox)
 
@@ -2922,8 +2966,8 @@ Stroke(SFXRow, C.Border, 0, 1)
 Create("TextLabel", {
 BackgroundTransparency = 1,
 Text = "SFX Volume",
-Font = Enum.Font.GothamMedium,
-TextSize = 11,
+Font = Enum.Font.Code,
+TextSize = 10,
 TextColor3 = C.White,
 TextXAlignment = Enum.TextXAlignment.Left,
 Size = UDim2.fromOffset(140, 25),
@@ -2958,8 +3002,8 @@ Stroke(UISizeRow, C.Border, 0, 1)
 Create("TextLabel", {
 BackgroundTransparency = 1,
 Text = "UI Size",
-Font = Enum.Font.GothamMedium,
-TextSize = 11,
+Font = Enum.Font.Code,
+TextSize = 10,
 TextColor3 = C.White,
 TextXAlignment = Enum.TextXAlignment.Left,
 Size = UDim2.fromOffset(140, 25),
@@ -2998,7 +3042,7 @@ BackgroundColor3 = C.Panel3,
 BorderSizePixel = 0,
 Text = "",
 PlaceholderText = "Config name...",
-Font = Enum.Font.GothamMedium,
+Font = Enum.Font.Code,
 TextSize = 10,
 TextColor3 = C.White,
 PlaceholderColor3 = C.Muted,
@@ -3013,7 +3057,7 @@ local ConfigDropdown = Create("TextButton", {
 BackgroundColor3 = C.Panel2,
 BorderSizePixel = 0,
 Text = "Select Config",
-Font = Enum.Font.GothamMedium,
+Font = Enum.Font.Code,
 TextSize = 10,
 TextColor3 = C.White,
 AutoButtonColor = false,
@@ -3029,7 +3073,7 @@ Size = UDim2.new(1, -10, 0, 100),
 Position = UDim2.fromOffset(5, 542),
 CanvasSize = UDim2.fromOffset(0, 0),
 AutomaticCanvasSize = Enum.AutomaticSize.Y,
-ScrollBarThickness = 2,
+ScrollBarThickness = 1,
 Visible = false,
 ZIndex = 100,
 }, SettingsPage)
@@ -3045,7 +3089,7 @@ BackgroundColor3 = C.Panel3,
 BorderSizePixel = 0,
 Text = "",
 PlaceholderText = "New config name...",
-Font = Enum.Font.GothamMedium,
+Font = Enum.Font.Code,
 TextSize = 10,
 TextColor3 = C.White,
 PlaceholderColor3 = C.Muted,
@@ -3161,7 +3205,7 @@ local button = Create("TextButton", {
 BackgroundColor3 = C.Panel2,
 BorderSizePixel = 0,
 Text = name,
-Font = Enum.Font.GothamMedium,
+Font = Enum.Font.Code,
 TextSize = 10,
 TextColor3 = C.White,
 AutoButtonColor = false,
@@ -3183,7 +3227,7 @@ local button = Create("TextButton", {
 BackgroundColor3 = C.Panel2,
 BorderSizePixel = 0,
 Text = text,
-Font = Enum.Font.GothamBold,
+Font = Enum.Font.Code,
 TextSize = 9,
 TextColor3 = C.White,
 AutoButtonColor = false,
@@ -3210,7 +3254,7 @@ local button = Create("TextButton", {
 BackgroundColor3 = C.Panel2,
 BorderSizePixel = 0,
 Text = text,
-Font = Enum.Font.GothamBold,
+Font = Enum.Font.Code,
 TextSize = 9,
 TextColor3 = C.White,
 AutoButtonColor = false,
@@ -3256,7 +3300,7 @@ local RenameButton = Create("TextButton", {
 BackgroundColor3 = C.Panel2,
 BorderSizePixel = 0,
 Text = "RENAME CONFIG",
-Font = Enum.Font.GothamBold,
+Font = Enum.Font.Code,
 TextSize = 9,
 TextColor3 = C.White,
 AutoButtonColor = false,
@@ -3283,6 +3327,81 @@ ConfigList.Visible = not ConfigList.Visible
 end)
 
 RefreshConfigList()
+
+--==================================================
+-- REFERENCE TWO-COLUMN LAYOUT
+--==================================================
+
+local function BuildReferenceColumns()
+    local thresholds = {
+        Combat = 445,
+        Visuals = 405,
+        Player = 455,
+        Game = math.huge,
+        Settings = 435,
+    }
+
+    for pageName, page in pairs(Pages) do
+        local threshold = thresholds[pageName] or math.huge
+
+        -- Two subtle panels behind the feature columns.
+        local divider = Create("Frame", {
+            Name = "ColumnDivider",
+            BackgroundColor3 = C.Border,
+            BorderSizePixel = 0,
+            Size = UDim2.new(0, 1, 1, -8),
+            Position = UDim2.new(0.5, 0, 0, 4),
+            ZIndex = 1,
+        }, page)
+
+        local left = Create("Frame", {
+            Name = "LeftColumn",
+            BackgroundColor3 = C.Panel,
+            BackgroundTransparency = 0.18,
+            BorderSizePixel = 0,
+            Size = UDim2.new(0.5, -6, 1, -8),
+            Position = UDim2.fromOffset(0, 4),
+            ZIndex = 0,
+        }, page)
+        local right = Create("Frame", {
+            Name = "RightColumn",
+            BackgroundColor3 = C.Panel,
+            BackgroundTransparency = 0.18,
+            BorderSizePixel = 0,
+            Size = UDim2.new(0.5, -6, 1, -8),
+            Position = UDim2.new(0.5, 6, 0, 4),
+            ZIndex = 0,
+        }, page)
+        Stroke(left, C.Border, 0.65, 1)
+        Stroke(right, C.Border, 0.65, 1)
+
+        for _, child in ipairs(page:GetChildren()) do
+            if child:IsA("GuiObject") and child ~= divider and child ~= left and child ~= right then
+                local y = child.Position.Y.Offset
+                local isHeader = y < 70
+                if isHeader then
+                    child.Size = UDim2.new(1, -10, child.Size.Y.Scale, child.Size.Y.Offset)
+                    child.Position = UDim2.fromOffset(5, math.max(2, y))
+                else
+                    local rightSide = (y >= threshold)
+                    local newX = rightSide and (page.AbsoluteSize.X * 0.5 + 6) or 5
+                    local newY = rightSide and (y - threshold + 70) or y
+                    child.Position = UDim2.new(rightSide and 0.5 or 0, rightSide and 6 or 5, 0, newY)
+                    child.Size = UDim2.new(0.5, -16, child.Size.Y.Scale, child.Size.Y.Offset)
+                end
+            end
+        end
+
+        -- Recreate header width after columns are in place.
+        for _, child in ipairs(page:GetChildren()) do
+            if child:IsA("Frame") and child.Name == "ColumnDivider" then
+                child.ZIndex = 2
+            end
+        end
+    end
+end
+
+BuildReferenceColumns()
 
 --==================================================
 -- OPEN/CLOSE ANIMATION
@@ -3331,7 +3450,6 @@ PlayClick()
 if Minimized then
 Minimized = false
 Maximized = false
-Sidebar.Visible = true
 Content.Visible = true
 Main.BackgroundTransparency = 0
 Main.Size = NormalSize
@@ -3340,7 +3458,6 @@ if ClockEnabled then ShowClock() end
 else
 Minimized = true
 HideClock()
-Sidebar.Visible = false
 Content.Visible = false
 Main.Size = UDim2.fromOffset(CONFIG.Width, 64)
 end
@@ -3353,8 +3470,8 @@ Maximized = not Maximized
 if Maximized then
 Main.AnchorPoint = Vector2.new(0, 0)
 Tween(Main, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-Size = UDim2.new(0.86, 0, 0.86, 0),
-Position = UDim2.new(0.07, 0, 0.07, 0),
+Size = UDim2.new(0.90, 0, 0.90, 0),
+Position = UDim2.new(0.05, 0, 0.05, 0),
 })
 else
 Tween(Main, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
