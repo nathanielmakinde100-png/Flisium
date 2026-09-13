@@ -48,21 +48,24 @@ end
 --==================================================
 
 local C = {
-Black = Color3.fromRGB(3, 3, 4),
-Panel = Color3.fromRGB(7, 7, 9),
-Panel2 = Color3.fromRGB(11, 11, 13),
-Panel3 = Color3.fromRGB(15, 15, 18),
+Black = Color3.fromRGB(4, 7, 18),
+Panel = Color3.fromRGB(7, 12, 30),
+Panel2 = Color3.fromRGB(10, 18, 42),
+Panel3 = Color3.fromRGB(15, 28, 62),
 
-White = Color3.fromRGB(245, 245, 247),
-Muted = Color3.fromRGB(145, 145, 151),
-Dim = Color3.fromRGB(75, 75, 82),
+White = Color3.fromRGB(245, 248, 255),
+Muted = Color3.fromRGB(155, 171, 205),
+Dim = Color3.fromRGB(83, 103, 145),
 
-Border = Color3.fromRGB(30, 30, 34),
+Border = Color3.fromRGB(35, 61, 112),
 
-Accent = Color3.fromRGB(225, 225, 230),
-AccentDark = Color3.fromRGB(125, 125, 132),
+Accent = Color3.fromRGB(45, 105, 255), -- Royal blue
+AccentDark = Color3.fromRGB(28, 68, 170),
+Cyan = Color3.fromRGB(42, 224, 255),
+Violet = Color3.fromRGB(139, 92, 246),
+Magenta = Color3.fromRGB(236, 72, 153),
 
-Red = Color3.fromRGB(235, 65, 65),
+Red = Color3.fromRGB(255, 75, 95),
 }
 
 --==================================================
@@ -145,6 +148,11 @@ local SelectedConfig = nil
 local UIScaleObject
 local ClockTab
 local ShowClock, HideClock
+local Opened = true
+local Minimized = false
+local Maximized = false
+local NormalSize = UDim2.fromOffset(CONFIG.Width, CONFIG.Height)
+local NormalPosition = UDim2.new(0.5, -CONFIG.Width / 2, 0.5, -CONFIG.Height / 2)
 
 --==================================================
 -- GUI
@@ -171,8 +179,24 @@ BorderSizePixel = 0,
 ClipsDescendants = true,
 }, Gui)
 
-Round(Main, 10)
-Stroke(Main, C.Border, 0, 1)
+Round(Main, 12)
+local MainStroke = Stroke(Main, C.Border, 0, 1)
+local Ambient = Instance.new("UIGradient")
+Ambient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, C.Panel),
+    ColorSequenceKeypoint.new(0.5, C.Panel2),
+    ColorSequenceKeypoint.new(1, C.Panel)
+})
+Ambient.Rotation = 25
+Ambient.Parent = Main
+
+task.spawn(function()
+    while Main.Parent do
+        Tween(Ambient, TweenInfo.new(5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Rotation = 205}).Completed:Wait()
+        Tween(Ambient, TweenInfo.new(5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Rotation = 25}).Completed:Wait()
+    end
+end)
+
 
 -- Shadow
 local Shadow = Create("ImageLabel", {
@@ -313,6 +337,25 @@ end
 local MinButton = CreateWindowButton("—", UDim2.new(1, -112, 0, 16))
 local MaxButton = CreateWindowButton("□", UDim2.new(1, -74, 0, 16))
 local CloseButton = CreateWindowButton("×", UDim2.new(1, -36, 0, 16))
+local function AddButtonGlow(button, color)
+    local stroke = button:FindFirstChildOfClass("UIStroke")
+    if stroke then
+        stroke.Color = color
+        stroke.Transparency = 0.25
+        button.MouseEnter:Connect(function()
+            Tween(button, TweenInfo.new(0.12), {BackgroundColor3 = C.Panel3})
+            Tween(stroke, TweenInfo.new(0.12), {Transparency = 0})
+            PlayHover()
+        end)
+        button.MouseLeave:Connect(function()
+            Tween(button, TweenInfo.new(0.12), {BackgroundColor3 = C.Panel2})
+            Tween(stroke, TweenInfo.new(0.12), {Transparency = 0.25})
+        end)
+    end
+end
+AddButtonGlow(MinButton, C.Cyan)
+AddButtonGlow(MaxButton, C.Violet)
+AddButtonGlow(CloseButton, C.Magenta)
 
 --==================================================
 -- DRAGGING
@@ -531,10 +574,10 @@ Round(button, 6)
 
 local indicator = Create("Frame", {
 Name = "Indicator",
-BackgroundColor3 = C.White,
+BackgroundColor3 = C.Cyan,
 BackgroundTransparency = 1,
 BorderSizePixel = 0,
-Size = UDim2.fromOffset(2, 18),
+Size = UDim2.fromOffset(3, 22),
 Position = UDim2.new(0, 0, 0.5, -9),
 ZIndex = 23,
 }, button)
@@ -579,7 +622,7 @@ ZIndex = 20,
 }, Sidebar)
 
 local StatusDot = Create("Frame", {
-BackgroundColor3 = Color3.fromRGB(90, 220, 130),
+BackgroundColor3 = C.Cyan,
 Size = UDim2.fromOffset(7, 7),
 Position = UDim2.fromOffset(4, 8),
 BorderSizePixel = 0,
@@ -590,7 +633,7 @@ Round(StatusDot, 50)
 
 local StatusText = Create("TextLabel", {
 BackgroundTransparency = 1,
-Text = "SYSTEM READY",
+Text = "SYSTEM ONLINE • FLISIUM",
 Font = Enum.Font.GothamMedium,
 TextSize = 9,
 TextColor3 = C.Muted,
@@ -602,7 +645,7 @@ ZIndex = 22,
 
 local VersionText = Create("TextLabel", {
 BackgroundTransparency = 1,
-Text = "FLISIUM // LOCAL",
+Text = "ROYAL BLUE EDITION // CLIENT",
 Font = Enum.Font.Gotham,
 TextSize = 8,
 TextColor3 = C.Dim,
@@ -939,6 +982,7 @@ local Gravity = 196.2
 local FlySpeed = 50
 
 local CollisionEnabled = true
+local NoclipEnabled = false
 local Invisible = false
 local InvisibleTransparency = 1
 
@@ -1272,93 +1316,78 @@ end
 end)
 
 --==================================================
--- FLY CONTROLLER
+-- FLY + NOCLIP CONTROLLER
 --==================================================
 
 local FlyAttachment
 local FlyVelocity
 
 local function StopFly()
-if FlyVelocity then
-FlyVelocity:Destroy()
-FlyVelocity = nil
-end
-if FlyAttachment then
-FlyAttachment:Destroy()
-FlyAttachment = nil
-end
-
-local humanoid = GetHumanoid()
-if humanoid then
-humanoid.PlatformStand = false
-end
+    if FlyVelocity then FlyVelocity:Destroy(); FlyVelocity = nil end
+    if FlyAttachment then FlyAttachment:Destroy(); FlyAttachment = nil end
+    local humanoid = GetHumanoid()
+    if humanoid then
+        humanoid.PlatformStand = false
+        humanoid.AutoRotate = true
+        humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+    end
 end
 
 local function StartFly()
-local character = GetCharacter()
-local root = character and character:FindFirstChild("HumanoidRootPart")
-local humanoid = GetHumanoid()
-
-if not root or not humanoid then
-return
-end
-
-StopFly()
-
-FlyAttachment = Instance.new("Attachment")
-FlyAttachment.Name = "FlisiumFlyAttachment"
-FlyAttachment.Parent = root
-
-FlyVelocity = Instance.new("LinearVelocity")
-FlyVelocity.Name = "FlisiumFlyVelocity"
-FlyVelocity.Attachment0 = FlyAttachment
-FlyVelocity.MaxForce = math.huge
-FlyVelocity.RelativeTo = Enum.ActuatorRelativeTo.World
-FlyVelocity.VectorVelocity = Vector3.zero
-FlyVelocity.Parent = root
-
-humanoid.PlatformStand = true
+    local character = GetCharacter()
+    local root = character and character:FindFirstChild("HumanoidRootPart")
+    local humanoid = GetHumanoid()
+    if not root or not humanoid then return end
+    StopFly()
+    FlyAttachment = Instance.new("Attachment")
+    FlyAttachment.Name = "FlisiumFlyAttachment"
+    FlyAttachment.Parent = root
+    FlyVelocity = Instance.new("LinearVelocity")
+    FlyVelocity.Name = "FlisiumFlyVelocity"
+    FlyVelocity.Attachment0 = FlyAttachment
+    FlyVelocity.MaxForce = math.huge
+    FlyVelocity.RelativeTo = Enum.ActuatorRelativeTo.World
+    FlyVelocity.VectorVelocity = Vector3.zero
+    FlyVelocity.Parent = root
+    humanoid.AutoRotate = false
+    humanoid.PlatformStand = true
 end
 
 RunService.RenderStepped:Connect(function()
-if not FlyEnabled then
-if FlyVelocity or FlyAttachment then
-StopFly()
-end
-return
-end
+    local character = GetCharacter()
+    if character then
+        for _, object in ipairs(character:GetDescendants()) do
+            if object:IsA("BasePart") then
+                object.CanCollide = NoclipEnabled and false or CollisionEnabled
+            end
+        end
+    end
 
-local camera = Workspace.CurrentCamera
-local character = GetCharacter()
-local root = character and character:FindFirstChild("HumanoidRootPart")
+    if not FlyEnabled then
+        if FlyVelocity or FlyAttachment then StopFly() end
+        return
+    end
 
-if not camera or not root then
-return
-end
+    local camera = Workspace.CurrentCamera
+    local root = character and character:FindFirstChild("HumanoidRootPart")
+    local humanoid = GetHumanoid()
+    if not camera or not root or not humanoid then return end
 
-if not FlyVelocity or not FlyVelocity.Parent then
-StartFly()
-end
+    if not FlyVelocity or not FlyVelocity.Parent then StartFly() end
+    if not FlyVelocity then return end
 
-if not FlyVelocity then
-return
-end
-
-local direction = Vector3.zero
-
-if UserInputService:IsKeyDown(Enum.KeyCode.W) then direction += camera.CFrame.LookVector end
-if UserInputService:IsKeyDown(Enum.KeyCode.S) then direction -= camera.CFrame.LookVector end
-if UserInputService:IsKeyDown(Enum.KeyCode.D) then direction += camera.CFrame.RightVector end
-if UserInputService:IsKeyDown(Enum.KeyCode.A) then direction -= camera.CFrame.RightVector end
-if UserInputService:IsKeyDown(Enum.KeyCode.Space) then direction += Vector3.yAxis end
-if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then direction -= Vector3.yAxis end
-
-if direction.Magnitude > 0 then
-direction = direction.Unit * FlySpeed
-end
-
-FlyVelocity.VectorVelocity = direction
-root.CFrame = CFrame.lookAt(root.Position, root.Position + camera.CFrame.LookVector)
+    local look = camera.CFrame.LookVector
+    local right = camera.CFrame.RightVector
+    local direction = Vector3.zero
+    if UserInputService:IsKeyDown(Enum.KeyCode.W) then direction += look end
+    if UserInputService:IsKeyDown(Enum.KeyCode.S) then direction -= look end
+    if UserInputService:IsKeyDown(Enum.KeyCode.D) then direction += right end
+    if UserInputService:IsKeyDown(Enum.KeyCode.A) then direction -= right end
+    if UserInputService:IsKeyDown(Enum.KeyCode.Space) then direction += Vector3.yAxis end
+    if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then direction -= Vector3.yAxis end
+    if direction.Magnitude > 0 then direction = direction.Unit * FlySpeed else direction = Vector3.zero end
+    FlyVelocity.VectorVelocity = direction
+    root.AssemblyAngularVelocity = Vector3.zero
 end)
 
 --==================================================
@@ -1958,7 +1987,7 @@ local billboard = Instance.new("BillboardGui")
 billboard.Name = "FlisiumESP"
 billboard.Adornee = root
 billboard.AlwaysOnTop = true
-billboard.Size = UDim2.fromOffset(180, 80)
+billboard.Size = UDim2.fromOffset(180, 100)
 billboard.StudsOffset = Vector3.new(0, 3.2, 0)
 billboard.Enabled = true
 billboard.Parent = VisualGui
@@ -1994,7 +2023,7 @@ distance.Font = Enum.Font.GothamMedium
 distance.TextSize = 9
 distance.TextStrokeTransparency = 0.4
 distance.Size = UDim2.new(1, 0, 0, 16)
-distance.Position = UDim2.new(0, 0, 1, 0)
+distance.Position = UDim2.new(0, 0, 0, 78)
 distance.Visible = false
 distance.Parent = billboard
 
@@ -2469,7 +2498,7 @@ for _, object in ipairs(character:GetDescendants()) do
 
 if object:IsA("BasePart") then
 
-object.CanCollide = CollisionEnabled
+object.CanCollide = NoclipEnabled and false or CollisionEnabled
 
 if Invisible then
 object.LocalTransparencyModifier =
@@ -2528,7 +2557,7 @@ local CombatPage = Pages.Combat
 PageHeader(
 CombatPage,
 "Combat",
-"Aim assistance for targets in your own experience."
+"Targeting, FOV and tool-based trigger controls for your own experience."
 )
 
 local AimAssistEnabled = false
@@ -2536,6 +2565,10 @@ local FOVEnabled = true
 local FOVRadius = 150
 local AimSmoothness = 0
 local AimSensitivity = 1
+local TriggerbotEnabled = false
+local TriggerbotDelay = 0.08
+local TriggerbotRange = 1000
+local TriggerbotLast = 0
 
 local FOVCircle = Create("Frame", {
 BackgroundTransparency = 1,
@@ -2546,21 +2579,32 @@ Position = UDim2.fromScale(0.5, 0.5),
 Visible = true,
 ZIndex = 5,
 }, Gui)
-
 Round(FOVCircle, 999)
 Stroke(FOVCircle, C.White, 0.15, 1)
+
+local FOVLabel = Create("TextLabel", {
+BackgroundTransparency = 1,
+Text = "FOV",
+Font = Enum.Font.GothamBold,
+TextSize = 8,
+TextColor3 = C.Muted,
+AnchorPoint = Vector2.new(0.5, 1),
+Position = UDim2.fromScale(0.5, 0.5),
+Size = UDim2.fromOffset(50, 14),
+Visible = true,
+ZIndex = 6,
+}, Gui)
 
 local function UpdateFOVCircle()
 FOVCircle.Size = UDim2.fromOffset(FOVRadius * 2, FOVRadius * 2)
 FOVCircle.Visible = FOVEnabled
+FOVLabel.Visible = FOVEnabled
 end
 
 CreateSectionLabel(CombatPage, "Aim Assist", 75)
-
 CreateToggle(CombatPage, "Aim Assist", 105, function(state)
 AimAssistEnabled = state
 end)
-
 CreateToggle(CombatPage, "FOV Circle", 155, function(state)
 FOVEnabled = state
 UpdateFOVCircle()
@@ -2573,9 +2617,7 @@ BorderSizePixel = 0,
 Size = UDim2.new(1, -10, 0, 72),
 Position = UDim2.fromOffset(5, y),
 }, CombatPage)
-
 Stroke(row, C.Border, 0, 1)
-
 Create("TextLabel", {
 BackgroundTransparency = 1,
 Text = title,
@@ -2586,26 +2628,22 @@ TextXAlignment = Enum.TextXAlignment.Left,
 Size = UDim2.fromOffset(150, 25),
 Position = UDim2.fromOffset(12, 8),
 }, row)
-
 local holder = Create("Frame", {
 BackgroundTransparency = 1,
 Size = UDim2.new(1, -105, 0, 30),
 Position = UDim2.fromOffset(12, 38),
 }, row)
-
 local box
 local slider = CreateSlider(holder, min, max, default, function(value)
 setter(value)
 if box then box.Text = formatter(value) end
 end)
-
 box = CreateValueBox(row, formatter(default), function(value)
 local clamped = Clamp(value, min, max)
 setter(clamped)
 box.Text = formatter(clamped)
 slider.SetSilent(clamped)
 end)
-
 return slider, box
 end
 
@@ -2624,15 +2662,26 @@ local SensSlider, SensBox = CreateCombatValueRow(365, "Sensitivity", 0.1, 5, Aim
 function(v) return string.format("%.2f", v) end,
 function(v) AimSensitivity = Clamp(v, 0.1, 5) end)
 
+CreateSectionLabel(CombatPage, "Triggerbot", 445)
+CreateToggle(CombatPage, "Triggerbot", 475, function(state)
+TriggerbotEnabled = state
+end)
+
+local TriggerDelaySlider, TriggerDelayBox = CreateCombatValueRow(525, "Trigger Delay", 0, 0.5, TriggerbotDelay,
+function(v) return string.format("%.2f s", v) end,
+function(v) TriggerbotDelay = Clamp(v, 0, 0.5) end)
+
+local TriggerRangeSlider, TriggerRangeBox = CreateCombatValueRow(605, "Trigger Range", 10, 1000, TriggerbotRange,
+function(v) return tostring(math.floor(v + 0.5)) .. " studs" end,
+function(v) TriggerbotRange = math.floor(v + 0.5) end)
+
 local AimInfo = Create("Frame", {
 BackgroundColor3 = C.Panel2,
 BorderSizePixel = 0,
-Size = UDim2.new(1, -10, 0, 72),
-Position = UDim2.fromOffset(5, 445),
+Size = UDim2.new(1, -10, 0, 82),
+Position = UDim2.fromOffset(5, 685),
 }, CombatPage)
-
 Stroke(AimInfo, C.Border, 0, 1)
-
 Create("TextLabel", {
 BackgroundTransparency = 1,
 Text = "Targeting",
@@ -2643,17 +2692,16 @@ TextXAlignment = Enum.TextXAlignment.Left,
 Size = UDim2.new(1, -24, 0, 20),
 Position = UDim2.fromOffset(12, 9),
 }, AimInfo)
-
 Create("TextLabel", {
 BackgroundTransparency = 1,
-Text = "Camera mode targets player characters in your own experience.",
+Text = "Shush/Silent Aim is intentionally omitted: a normal LocalScript cannot safely rewrite arbitrary weapon hit registration. Triggerbot uses Tool:Activate() when your equipped tool supports it.",
 Font = Enum.Font.Gotham,
 TextSize = 9,
 TextColor3 = C.Muted,
 TextXAlignment = Enum.TextXAlignment.Left,
 TextWrapped = true,
-Size = UDim2.new(1, -24, 0, 32),
-Position = UDim2.fromOffset(12, 32),
+Size = UDim2.new(1, -24, 0, 42),
+Position = UDim2.fromOffset(12, 31),
 }, AimInfo)
 
 --==================================================
@@ -2663,22 +2711,20 @@ Position = UDim2.fromOffset(12, 32),
 local function GetAimTarget()
 local camera = Workspace.CurrentCamera
 if not camera then return nil end
-
 local center = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
 local closest
 local closestDistance = math.huge
-
 for _, player in ipairs(Players:GetPlayers()) do
 if player ~= LocalPlayer and player.Character then
 local character = player.Character
 local humanoid = character:FindFirstChildOfClass("Humanoid")
 local root = character:FindFirstChild("HumanoidRootPart")
-
 if humanoid and humanoid.Health > 0 and root then
 local screen, visible = camera:WorldToViewportPoint(root.Position)
 if visible and screen.Z > 0 then
 local distance = (Vector2.new(screen.X, screen.Y) - center).Magnitude
-if distance <= FOVRadius and distance < closestDistance then
+local worldDistance = (camera.CFrame.Position - root.Position).Magnitude
+if distance <= FOVRadius and worldDistance <= TriggerbotRange and distance < closestDistance then
 closestDistance = distance
 closest = root
 end
@@ -2686,38 +2732,69 @@ end
 end
 end
 end
-
 return closest
+end
+
+local function GetCrosshairTarget()
+local camera = Workspace.CurrentCamera
+if not camera then return nil end
+local viewport = camera.ViewportSize
+local ray = camera:ViewportPointToRay(viewport.X / 2, viewport.Y / 2)
+local params = RaycastParams.new()
+params.FilterType = Enum.RaycastFilterType.Exclude
+params.FilterDescendantsInstances = {LocalPlayer.Character}
+params.IgnoreWater = true
+local result = Workspace:Raycast(ray.Origin, ray.Direction * TriggerbotRange, params)
+if not result then return nil end
+local model = result.Instance:FindFirstAncestorOfClass("Model")
+if not model then return nil end
+local player = Players:GetPlayerFromCharacter(model)
+if not player or player == LocalPlayer then return nil end
+local humanoid = model:FindFirstChildOfClass("Humanoid")
+if not humanoid or humanoid.Health <= 0 then return nil end
+return model
+end
+
+local function ActivateEquippedTool()
+local character = LocalPlayer.Character
+if not character then return false end
+local tool = character:FindFirstChildOfClass("Tool")
+if not tool then return false end
+local ok = pcall(function()
+tool:Activate()
+end)
+return ok
 end
 
 RunService.RenderStepped:Connect(function(dt)
 local camera = Workspace.CurrentCamera
 if not camera then return end
+local center = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+FOVCircle.Position = UDim2.fromOffset(center.X, center.Y)
+FOVLabel.Position = UDim2.fromOffset(center.X, center.Y - FOVRadius - 4)
 
-if FOVEnabled then
-FOVCircle.Position = UDim2.fromOffset(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
-end
-
-if not AimAssistEnabled then
-return
-end
-
+if AimAssistEnabled then
 local target = GetAimTarget()
-if not target then
-return
-end
-
+if target then
 local targetCFrame = CFrame.lookAt(camera.CFrame.Position, target.Position)
-
 local alpha
 if AimSmoothness <= 0 then
 alpha = 1
 else
--- 0 = snap; 1 = slowest. Sensitivity adjusts how quickly it turns.
 alpha = Clamp((1 - AimSmoothness) * AimSensitivity * dt * 8, 0.01, 1)
 end
-
 camera.CFrame = camera.CFrame:Lerp(targetCFrame, alpha)
+end
+end
+
+if TriggerbotEnabled and os.clock() - TriggerbotLast >= TriggerbotDelay then
+local target = GetCrosshairTarget()
+if target then
+if ActivateEquippedTool() then
+TriggerbotLast = os.clock()
+end
+end
+end
 end)
 
 --==================================================
@@ -2725,45 +2802,81 @@ end)
 --==================================================
 
 local GamePage = Pages.Game
+PageHeader(GamePage, "Game", "Useful client-side utilities for your own experience.")
+CreateSectionLabel(GamePage, "Utilities", 75)
 
-PageHeader(
-GamePage,
-"Game",
-"Game utilities and controls."
-)
-
-CreateSectionLabel(GamePage, "Utilities", 90)
-
-local GameInfo = Create("Frame", {
-BackgroundColor3 = C.Panel2,
-BorderSizePixel = 0,
-Size = UDim2.new(1, -10, 0, 70),
-Position = UDim2.fromOffset(5, 120),
+local FPSLabel = Create("TextLabel", {
+BackgroundColor3 = C.Panel2, BorderSizePixel = 0, Text = "FPS  --",
+Font = Enum.Font.GothamMedium, TextSize = 11, TextColor3 = C.White,
+TextXAlignment = Enum.TextXAlignment.Left, Size = UDim2.new(1, -10, 0, 42),
+Position = UDim2.fromOffset(5, 102),
 }, GamePage)
+Stroke(FPSLabel, C.Border, 0, 1)
 
-Stroke(GameInfo, C.Border, 0, 1)
+local PingLabel = Create("TextLabel", {
+BackgroundColor3 = C.Panel2, BorderSizePixel = 0, Text = "Server: " .. game.JobId,
+Font = Enum.Font.GothamMedium, TextSize = 10, TextColor3 = C.White,
+TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd,
+Size = UDim2.new(1, -10, 0, 42), Position = UDim2.fromOffset(5, 152),
+}, GamePage)
+Stroke(PingLabel, C.Border, 0, 1)
 
+local RejoinButton = Create("TextButton", {
+BackgroundColor3 = C.Panel2, BorderSizePixel = 0, Text = "RELOAD CHARACTER",
+Font = Enum.Font.GothamBold, TextSize = 10, TextColor3 = C.White, AutoButtonColor = false,
+Size = UDim2.new(1, -10, 0, 42), Position = UDim2.fromOffset(5, 202),
+}, GamePage)
+Stroke(RejoinButton, C.Border, 0, 1)
+RejoinButton.MouseButton1Click:Connect(function()
+PlayClick()
+local humanoid = GetHumanoid()
+if humanoid then humanoid.Health = 0 end
+end)
+
+local FullscreenButton = Create("TextButton", {
+BackgroundColor3 = C.Panel2, BorderSizePixel = 0, Text = "TOGGLE FULLSCREEN UI",
+Font = Enum.Font.GothamBold, TextSize = 10, TextColor3 = C.White, AutoButtonColor = false,
+Size = UDim2.new(1, -10, 0, 42), Position = UDim2.fromOffset(5, 252),
+}, GamePage)
+Stroke(FullscreenButton, C.Border, 0, 1)
+FullscreenButton.MouseButton1Click:Connect(function()
+PlayClick()
+Maximized = not Maximized
+if Maximized then
+Main.Size = UDim2.new(0.86, 0, 0.86, 0)
+Main.Position = UDim2.new(0.07, 0, 0.07, 0)
+else
+Main.Size = NormalSize
+Main.Position = NormalPosition
+end
+end)
+
+local InfoBox = Create("Frame", {
+BackgroundColor3 = C.Panel2, BorderSizePixel = 0, Size = UDim2.new(1, -10, 0, 92),
+Position = UDim2.fromOffset(5, 302),
+}, GamePage)
+Stroke(InfoBox, C.Border, 0, 1)
 Create("TextLabel", {
-BackgroundTransparency = 1,
-Text = "Game modules",
-Font = Enum.Font.GothamBold,
-TextSize = 13,
-TextColor3 = C.White,
-TextXAlignment = Enum.TextXAlignment.Left,
-Size = UDim2.new(1, -24, 0, 22),
-Position = UDim2.fromOffset(12, 10),
-}, GameInfo)
+BackgroundTransparency = 1, Text = "CLIENT INFO", Font = Enum.Font.GothamBold, TextSize = 10,
+TextColor3 = C.Muted, TextXAlignment = Enum.TextXAlignment.Left,
+Size = UDim2.new(1, -24, 0, 18), Position = UDim2.fromOffset(12, 8),
+}, InfoBox)
+local ClientInfo = Create("TextLabel", {
+BackgroundTransparency = 1, Text = "Player: " .. LocalPlayer.DisplayName .. "\nUserId: " .. LocalPlayer.UserId .. "\nPlaceId: " .. game.PlaceId,
+Font = Enum.Font.GothamMedium, TextSize = 10, TextColor3 = C.White, TextXAlignment = Enum.TextXAlignment.Left,
+Size = UDim2.new(1, -24, 0, 60), Position = UDim2.fromOffset(12, 28),
+}, InfoBox)
 
-Create("TextLabel", {
-BackgroundTransparency = 1,
-Text = "Ready for additional game utilities.",
-Font = Enum.Font.Gotham,
-TextSize = 10,
-TextColor3 = C.Muted,
-TextXAlignment = Enum.TextXAlignment.Left,
-Size = UDim2.new(1, -24, 0, 18),
-Position = UDim2.fromOffset(12, 36),
-}, GameInfo)
+local fpsAccum, fpsFrames = 0, 0
+RunService.RenderStepped:Connect(function(dt)
+fpsAccum += dt
+fpsFrames += 1
+if fpsAccum >= 0.5 then
+local fps = math.floor(fpsFrames / fpsAccum + 0.5)
+FPSLabel.Text = "FPS  " .. fps
+fpsAccum, fpsFrames = 0, 0
+end
+end)
 
 --==================================================
 -- SETTINGS PAGE
@@ -2794,11 +2907,15 @@ CreateToggle(SettingsPage, "UI Sounds", 170, function(state)
 UISoundsEnabled = state
 end)
 
+CreateToggle(SettingsPage, "Animations", 220, function(state)
+-- Kept as a UI preference; core movement/target loops remain active.
+end)
+
 local SFXRow = Create("Frame", {
 BackgroundColor3 = C.Panel2,
 BorderSizePixel = 0,
 Size = UDim2.new(1, -10, 0, 70),
-Position = UDim2.fromOffset(5, 220),
+Position = UDim2.fromOffset(5, 270),
 }, SettingsPage)
 Stroke(SFXRow, C.Border, 0, 1)
 
@@ -2834,7 +2951,7 @@ local UISizeRow = Create("Frame", {
 BackgroundColor3 = C.Panel2,
 BorderSizePixel = 0,
 Size = UDim2.new(1, -10, 0, 70),
-Position = UDim2.fromOffset(5, 300),
+Position = UDim2.fromOffset(5, 350),
 }, SettingsPage)
 Stroke(UISizeRow, C.Border, 0, 1)
 
@@ -2874,7 +2991,7 @@ UISizeBox.Text = "100%"
 -- CONFIG SYSTEM (SESSION ONLY)
 --==================================================
 
-CreateSectionLabel(SettingsPage, "Configs", 385)
+CreateSectionLabel(SettingsPage, "Configs", 435)
 
 local ConfigNameBox = Create("TextBox", {
 BackgroundColor3 = C.Panel3,
@@ -2887,7 +3004,7 @@ TextColor3 = C.White,
 PlaceholderColor3 = C.Muted,
 ClearTextOnFocus = false,
 Size = UDim2.new(1, -10, 0, 34),
-Position = UDim2.fromOffset(5, 412),
+Position = UDim2.fromOffset(5, 462),
 }, SettingsPage)
 Round(ConfigNameBox, 5)
 Stroke(ConfigNameBox, C.Border, 0, 1)
@@ -2901,7 +3018,7 @@ TextSize = 10,
 TextColor3 = C.White,
 AutoButtonColor = false,
 Size = UDim2.new(1, -10, 0, 34),
-Position = UDim2.fromOffset(5, 454),
+Position = UDim2.fromOffset(5, 504),
 }, SettingsPage)
 Stroke(ConfigDropdown, C.Border, 0, 1)
 
@@ -2909,7 +3026,7 @@ local ConfigList = Create("ScrollingFrame", {
 BackgroundColor3 = C.Panel,
 BorderSizePixel = 0,
 Size = UDim2.new(1, -10, 0, 100),
-Position = UDim2.fromOffset(5, 492),
+Position = UDim2.fromOffset(5, 542),
 CanvasSize = UDim2.fromOffset(0, 0),
 AutomaticCanvasSize = Enum.AutomaticSize.Y,
 ScrollBarThickness = 2,
@@ -2934,7 +3051,7 @@ TextColor3 = C.White,
 PlaceholderColor3 = C.Muted,
 ClearTextOnFocus = false,
 Size = UDim2.new(1, -10, 0, 34),
-Position = UDim2.fromOffset(5, 602),
+Position = UDim2.fromOffset(5, 652),
 }, SettingsPage)
 Round(RenameBox, 5)
 Stroke(RenameBox, C.Border, 0, 1)
@@ -2950,6 +3067,7 @@ GravityEnabled = GravityEnabled,
 FlySpeed = FlySpeed,
 FlyEnabled = FlyEnabled,
 CollisionEnabled = CollisionEnabled,
+NoclipEnabled = NoclipEnabled,
 Invisible = Invisible,
 InvisibleTransparency = InvisibleTransparency,
 ClockEnabled = ClockEnabled,
@@ -2961,6 +3079,9 @@ FOVEnabled = FOVEnabled,
 FOVRadius = FOVRadius,
 AimSmoothness = AimSmoothness,
 AimSensitivity = AimSensitivity,
+TriggerbotEnabled = TriggerbotEnabled,
+TriggerbotDelay = TriggerbotDelay,
+TriggerbotRange = TriggerbotRange,
 }
 
 return data
@@ -2978,6 +3099,7 @@ GravityEnabled = data.GravityEnabled or false
 FlySpeed = data.FlySpeed or FlySpeed
 FlyEnabled = data.FlyEnabled or false
 CollisionEnabled = data.CollisionEnabled ~= false
+NoclipEnabled = data.NoclipEnabled or false
 Invisible = data.Invisible or false
 InvisibleTransparency = data.InvisibleTransparency or InvisibleTransparency
 ClockEnabled = data.ClockEnabled ~= false
@@ -2989,6 +3111,9 @@ FOVEnabled = data.FOVEnabled ~= false
 FOVRadius = Clamp(data.FOVRadius or FOVRadius, 25, 600)
 AimSmoothness = Clamp(data.AimSmoothness or AimSmoothness, 0, 1)
 AimSensitivity = Clamp(data.AimSensitivity or AimSensitivity, 0.1, 5)
+TriggerbotEnabled = data.TriggerbotEnabled or false
+TriggerbotDelay = Clamp(data.TriggerbotDelay or TriggerbotDelay, 0, 0.5)
+TriggerbotRange = Clamp(data.TriggerbotRange or TriggerbotRange, 10, 1000)
 
 WalkSlider.SetSilent(WalkSpeed)
 JumpSlider.SetSilent(JumpPower)
@@ -2998,6 +3123,8 @@ InvisibleSlider.SetSilent(InvisibleTransparency)
 FOVSlider.SetSilent(FOVRadius)
 SmoothSlider.SetSilent(AimSmoothness)
 SensSlider.SetSilent(AimSensitivity)
+TriggerDelaySlider.SetSilent(TriggerbotDelay)
+TriggerRangeSlider.SetSilent(TriggerbotRange)
 
 WalkValueBox.Text = tostring(WalkSpeed)
 JumpValueBox.Text = tostring(JumpPower)
@@ -3007,6 +3134,8 @@ InvisibleValueBox.Text = string.format("%.2f", InvisibleTransparency)
 FOVBox.Text = tostring(FOVRadius)
 SmoothBox.Text = string.format("%.2f", AimSmoothness)
 SensBox.Text = string.format("%.2f", AimSensitivity)
+TriggerDelayBox.Text = string.format("%.2f s", TriggerbotDelay)
+TriggerRangeBox.Text = tostring(TriggerbotRange) .. " studs"
 SFXBox.Text = tostring(SFXVolume) .. "%"
 UISizeBox.Text = tostring(UISize) .. "%"
 UIScaleObject.Scale = UISize / 100
@@ -3073,7 +3202,7 @@ end
 local ConfigButtons = Create("Frame", {
 BackgroundTransparency = 1,
 Size = UDim2.new(1, -10, 0, 70),
-Position = UDim2.fromOffset(5, 644),
+Position = UDim2.fromOffset(5, 694),
 }, SettingsPage)
 
 local function ConfigAction(text, y, side, callback)
@@ -3132,7 +3261,7 @@ TextSize = 9,
 TextColor3 = C.White,
 AutoButtonColor = false,
 Size = UDim2.new(1, -10, 0, 30),
-Position = UDim2.fromOffset(5, 722),
+Position = UDim2.fromOffset(5, 772),
 ZIndex = 30,
 }, SettingsPage)
 Stroke(RenameButton, C.Border, 0, 1)
@@ -3159,20 +3288,6 @@ RefreshConfigList()
 -- OPEN/CLOSE ANIMATION
 --==================================================
 
-local Opened = true
-local Minimized = false
-local Maximized = false
-
-local NormalSize =
-UDim2.fromOffset(CONFIG.Width, CONFIG.Height)
-
-local NormalPosition =
-UDim2.new(
-0.5,
--CONFIG.Width / 2,
-0.5,
--CONFIG.Height / 2
-)
 
 ShowClock = function()
 if not ClockEnabled then
@@ -3212,97 +3327,40 @@ end)
 end
 
 MinButton.MouseButton1Click:Connect(function()
-
+PlayClick()
 if Minimized then
-
 Minimized = false
-
+Maximized = false
 Sidebar.Visible = true
 Content.Visible = true
-
-Tween(
-Main,
-TweenInfo.new(
-0.3,
-Enum.EasingStyle.Quint,
-Enum.EasingDirection.Out
-),
-{
-Size = NormalSize,
-}
-)
-
-ShowClock()
-
+Main.BackgroundTransparency = 0
+Main.Size = NormalSize
+Main.Position = Maximized and UDim2.new(0.07, 0, 0.07, 0) or NormalPosition
+if ClockEnabled then ShowClock() end
 else
-
 Minimized = true
-
 HideClock()
-
 Sidebar.Visible = false
 Content.Visible = false
-
-Tween(
-Main,
-TweenInfo.new(
-0.3,
-Enum.EasingStyle.Quint,
-Enum.EasingDirection.Out
-),
-{
-Size = UDim2.fromOffset(
-CONFIG.Width,
-64
-),
-}
-)
-
+Main.Size = UDim2.fromOffset(CONFIG.Width, 64)
 end
 end)
 
 MaxButton.MouseButton1Click:Connect(function()
-
-if Minimized then
-return
-end
-
+if Minimized then return end
 PlayClick()
-
-if not Maximized then
-
-Maximized = true
-
-Tween(
-Main,
-TweenInfo.new(
-0.35,
-Enum.EasingStyle.Quint,
-Enum.EasingDirection.Out
-),
-{
+Maximized = not Maximized
+if Maximized then
+Main.AnchorPoint = Vector2.new(0, 0)
+Tween(Main, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
 Size = UDim2.new(0.86, 0, 0.86, 0),
-Position = UDim2.new(0.5, 0, 0.5, 0),
-}
-)
-
+Position = UDim2.new(0.07, 0, 0.07, 0),
+})
 else
-
-Maximized = false
-
-Tween(
-Main,
-TweenInfo.new(
-0.35,
-Enum.EasingStyle.Quint,
-Enum.EasingDirection.Out
-),
-{
+Tween(Main, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
 Size = NormalSize,
 Position = NormalPosition,
-}
-)
-
+})
 end
 end)
 
@@ -3437,10 +3495,22 @@ end
 end)
 
 --==================================================
+-- AMBIENT UI VFX
+--==================================================
+
+task.spawn(function()
+    while Main.Parent do
+        Tween(MainStroke, TweenInfo.new(1.4, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Thickness = 1.8, Color = C.Accent}).Completed:Wait()
+        Tween(MainStroke, TweenInfo.new(1.4, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Thickness = 1, Color = C.Border}).Completed:Wait()
+    end
+end)
+
+--==================================================
 -- INITIAL STATE
 --==================================================
 
 SelectTab("Player")
+UpdateFOVCircle()
 ShowClock()
 
 -- Initial movement state
