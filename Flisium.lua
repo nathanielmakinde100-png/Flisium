@@ -636,6 +636,10 @@ Tween(icon, TweenInfo.new(0.18), {
 TextColor3 = selected and C.White or C.Muted,
 })
 end
+
+-- Switch the visible content page.
+for name, page in pairs(Pages) do
+page.Visible = (name == tabName)
 end
 end
 
@@ -717,6 +721,10 @@ TextColor3 = C.Muted,
 })
 Tween(label, TweenInfo.new(0.12), {TextColor3 = C.Muted})
 Tween(icon, TweenInfo.new(0.12), {TextColor3 = C.Muted})
+else
+Tween(button, TweenInfo.new(0.12), {
+BackgroundColor3 = C.AccentDark,
+})
 end
 end)
 
@@ -3740,7 +3748,8 @@ end)
 --==================================================
 
 for _, object in ipairs(Main:GetDescendants()) do
-    if object:IsA("TextButton") or object:IsA("ImageButton") then
+    if (object:IsA("TextButton") or object:IsA("ImageButton"))
+        and not TabButtons[object.Name] then
         PolishButton(object)
     end
 end
