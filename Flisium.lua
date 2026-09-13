@@ -27,11 +27,11 @@ ClickSound = "rbxassetid://116080744084010",
 HoverSound = "rbxassetid://139800881181209",
 CloseSound = "rbxassetid://8968249849",
 
-Width = 720,
-Height = 826,
+Width = 760,
+Height = 560,
 
 MinWidth = 620,
-MinHeight = 600,
+MinHeight = 420,
 }
 
 --==================================================
@@ -48,22 +48,22 @@ end
 --==================================================
 
 local C = {
-Black = Color3.fromRGB(8, 10, 9),
-Panel = Color3.fromRGB(14, 16, 15),
-Panel2 = Color3.fromRGB(24, 27, 25),
-Panel3 = Color3.fromRGB(34, 39, 35),
+Black = Color3.fromRGB(5, 8, 6),
+Panel = Color3.fromRGB(10, 14, 11),
+Panel2 = Color3.fromRGB(16, 22, 17),
+Panel3 = Color3.fromRGB(24, 33, 25),
 
-White = Color3.fromRGB(224, 229, 224),
-Muted = Color3.fromRGB(143, 151, 145),
-Dim = Color3.fromRGB(91, 101, 94),
+White = Color3.fromRGB(232, 242, 233),
+Muted = Color3.fromRGB(142, 157, 145),
+Dim = Color3.fromRGB(78, 94, 81),
 
-Border = Color3.fromRGB(48, 54, 49),
+Border = Color3.fromRGB(42, 59, 45),
 
-Accent = Color3.fromRGB(157, 205, 92),
-AccentDark = Color3.fromRGB(83, 116, 48),
-Cyan = Color3.fromRGB(157, 205, 92),
-Violet = Color3.fromRGB(118, 132, 119),
-Magenta = Color3.fromRGB(178, 190, 175),
+Accent = Color3.fromRGB(92, 218, 112),
+AccentDark = Color3.fromRGB(34, 104, 48),
+Cyan = Color3.fromRGB(92, 218, 112),
+Violet = Color3.fromRGB(68, 176, 88),
+Magenta = Color3.fromRGB(112, 232, 130),
 
 Red = Color3.fromRGB(215, 80, 85),
 }
@@ -85,7 +85,8 @@ end
 
 local function Round(object, radius)
 local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, radius)
+local finalRadius = (radius >= 100) and radius or 2
+corner.CornerRadius = UDim.new(0, finalRadius)
 corner.Parent = object
 return corner
 end
@@ -152,7 +153,7 @@ local Opened = true
 local Minimized = false
 local Maximized = false
 local NormalSize = UDim2.fromOffset(CONFIG.Width, CONFIG.Height)
-local NormalPosition = UDim2.fromOffset(0, 38)
+local NormalPosition = UDim2.new(0.5, -CONFIG.Width / 2, 0.5, -CONFIG.Height / 2)
 
 --==================================================
 -- GUI
@@ -173,13 +174,13 @@ DisplayOrder = 100,
 local Main = Create("Frame", {
 Name = "Main",
 Size = UDim2.fromOffset(CONFIG.Width, CONFIG.Height),
-Position = NormalPosition,
+Position = UDim2.new(0.5, -CONFIG.Width / 2, 0.5, -CONFIG.Height / 2),
 BackgroundColor3 = C.Black,
 BorderSizePixel = 0,
 ClipsDescendants = true,
 }, Gui)
 
-Round(Main, 6)
+Round(Main, 2)
 local MainStroke = Stroke(Main, C.Border, 0, 1)
 
 -- Shadow
@@ -203,12 +204,32 @@ Main.ZIndex = 10
 
 local AccentBar = Create("Frame", {
 Name = "Accent",
-Size = UDim2.new(1, 0, 0, 1),
+Size = UDim2.new(1, 0, 0, 2),
 Position = UDim2.fromOffset(0, 0),
-BackgroundColor3 = C.Border,
 BorderSizePixel = 0,
 ZIndex = 50,
 }, Main)
+
+local AccentGradient = Create("UIGradient", {
+Color = ColorSequence.new({
+ColorSequenceKeypoint.new(0, C.AccentDark),
+ColorSequenceKeypoint.new(0.5, C.Accent),
+ColorSequenceKeypoint.new(1, C.AccentDark),
+}),
+Offset = Vector2.new(-0.35, 0),
+}, AccentBar)
+
+task.spawn(function()
+while AccentBar.Parent do
+Tween(
+AccentGradient,
+TweenInfo.new(2.2, Enum.EasingStyle.Linear),
+{Offset = Vector2.new(0.35, 0)}
+).Completed:Wait()
+
+AccentGradient.Offset = Vector2.new(-0.35, 0)
+end
+end)
 
 --==================================================
 -- HEADER
@@ -216,7 +237,7 @@ ZIndex = 50,
 
 local Header = Create("Frame", {
 Name = "Header",
-Size = UDim2.new(1, 0, 0, 30),
+Size = UDim2.new(1, 0, 0, 36),
 BackgroundColor3 = C.Panel,
 BorderSizePixel = 0,
 ZIndex = 20,
@@ -226,22 +247,22 @@ local Logo = Create("ImageLabel", {
 Name = "Logo",
 BackgroundTransparency = 1,
 Image = CONFIG.Logo,
-Size = UDim2.fromOffset(13, 13),
-Position = UDim2.fromOffset(7, 8),
+Size = UDim2.fromOffset(18, 18),
+Position = UDim2.fromOffset(10, 9),
 ZIndex = 22,
 }, Header)
 
-Round(Logo, 7)
+Round(Logo, 2)
 
 local Title = Create("TextLabel", {
 BackgroundTransparency = 1,
-Text = "Flisium -",
+Text = "FLISIUM",
 Font = Enum.Font.Code,
 TextSize = 13,
 TextColor3 = C.White,
 TextXAlignment = Enum.TextXAlignment.Left,
-Size = UDim2.fromOffset(170, 18),
-Position = UDim2.fromOffset(25, 5),
+Size = UDim2.fromOffset(150, 18),
+Position = UDim2.fromOffset(35, 8),
 ZIndex = 22,
 }, Header)
 
@@ -255,7 +276,6 @@ TextXAlignment = Enum.TextXAlignment.Left,
 Size = UDim2.fromOffset(160, 12),
 Position = UDim2.fromOffset(36, 22),
 ZIndex = 22,
-Visible = false,
 }, Header)
 
 --==================================================
@@ -271,12 +291,12 @@ Font = Enum.Font.Code,
 TextSize = 13,
 TextColor3 = C.Muted,
 AutoButtonColor = false,
-Size = UDim2.fromOffset(20, 20),
+Size = UDim2.fromOffset(26, 26),
 Position = position,
 ZIndex = 25,
 }, Header)
 
-Round(button, 3)
+Round(button, 2)
 
 Stroke(button, C.Border, 0.2, 1)
 
@@ -299,9 +319,9 @@ end)
 return button
 end
 
-local MinButton = CreateWindowButton("-", UDim2.new(1, -70, 0, 5))
-local MaxButton = CreateWindowButton("+", UDim2.new(1, -47, 0, 5))
-local CloseButton = CreateWindowButton("x", UDim2.new(1, -24, 0, 5))
+local MinButton = CreateWindowButton("-", UDim2.new(1, -92, 0, 5))
+local MaxButton = CreateWindowButton("+", UDim2.new(1, -62, 0, 5))
+local CloseButton = CreateWindowButton("x", UDim2.new(1, -32, 0, 5))
 local function AddButtonGlow(button, color)
     local stroke = button:FindFirstChildOfClass("UIStroke")
     if stroke then
@@ -318,7 +338,7 @@ local function AddButtonGlow(button, color)
         end)
     end
 end
-AddButtonGlow(MinButton, C.Cyan)
+AddButtonGlow(MinButton, C.Accent)
 AddButtonGlow(MaxButton, C.Violet)
 AddButtonGlow(CloseButton, C.Magenta)
 
@@ -330,7 +350,7 @@ ClockTab = Create("Frame", {
     Name = "ClockTab",
     BackgroundColor3 = C.Black,
     BorderSizePixel = 0,
-    Size = UDim2.fromOffset(430, 38),
+    Size = UDim2.fromOffset(430, 22),
     Position = UDim2.fromOffset(0, 0),
     Visible = true,
     ZIndex = 100,
@@ -340,8 +360,8 @@ Stroke(ClockTab, C.Border, 0.15, 1)
 local ClockLogo = Create("ImageLabel", {
     BackgroundTransparency = 1,
     Image = CONFIG.Logo,
-    Size = UDim2.fromOffset(12, 12),
-    Position = UDim2.fromOffset(7, 13),
+    Size = UDim2.fromOffset(13, 13),
+    Position = UDim2.fromOffset(7, 4),
     ZIndex = 101,
 }, ClockTab)
 
@@ -353,19 +373,19 @@ local ClockBrand = Create("TextLabel", {
     TextColor3 = C.White,
     TextXAlignment = Enum.TextXAlignment.Left,
     Size = UDim2.fromOffset(100, 18),
-    Position = UDim2.fromOffset(25, 10),
+    Position = UDim2.fromOffset(26, 2),
     ZIndex = 101,
 }, ClockTab)
 
 ClockText = Create("TextLabel", {
     BackgroundTransparency = 1,
-    Text = "-- fps  •  ----, --, ----",
+    Text = "-- fps  •  --/--/----",
     Font = Enum.Font.Code,
     TextSize = 9,
     TextColor3 = C.Muted,
     TextXAlignment = Enum.TextXAlignment.Right,
     Size = UDim2.new(1, -138, 0, 18),
-    Position = UDim2.fromOffset(130, 10),
+    Position = UDim2.fromOffset(130, 2),
     ZIndex = 101,
 }, ClockTab)
 
@@ -373,7 +393,7 @@ ClockText = Create("TextLabel", {
 task.spawn(function()
     while Gui.Parent do
         local pos = Main.AbsolutePosition
-        ClockTab.Position = UDim2.fromOffset(pos.X, math.max(0, pos.Y - 38))
+        ClockTab.Position = UDim2.fromOffset(pos.X, math.max(0, pos.Y - 23))
         task.wait(0.05)
     end
 end)
@@ -448,14 +468,14 @@ end
 
 CreateDragZone(
 "LeftDrag",
-UDim2.fromOffset(8, CONFIG.Height - 60),
-UDim2.fromOffset(0, 60)
+UDim2.fromOffset(8, CONFIG.Height - 64),
+UDim2.fromOffset(0, 64)
 )
 
 CreateDragZone(
 "RightDrag",
-UDim2.fromOffset(8, CONFIG.Height - 60),
-UDim2.new(1, -8, 0, 60)
+UDim2.fromOffset(8, CONFIG.Height - 64),
+UDim2.new(1, -8, 0, 64)
 )
 
 CreateDragZone(
@@ -488,8 +508,8 @@ ZIndex = 18,
 
 local TabContainer = Create("Frame", {
 BackgroundTransparency = 1,
-Size = UDim2.new(1, -16, 0, 30),
-Position = UDim2.fromOffset(8, 30),
+Size = UDim2.new(1, -16, 0, 28),
+Position = UDim2.fromOffset(8, 36),
 ZIndex = 40,
 }, Main)
 
@@ -502,20 +522,11 @@ SortOrder = Enum.SortOrder.LayoutOrder,
 }, TabContainer)
 
 local Tabs = {
-"Aiming",
+"Combat",
 "Visuals",
-"Misc",
-"Output",
-"Options",
-"Player List",
-}
-
-local TabPageMap = {
-Aiming = "Combat",
-Visuals = "Visuals",
-Misc = "Player",
-Output = "Game",
-Options = "Settings",
+"Player",
+"Game",
+"Settings",
 }
 
 local TabButtons = {}
@@ -527,28 +538,20 @@ local Pages = {}
 
 local Content = Create("Frame", {
 Name = "Content",
-Size = UDim2.new(1, 0, 1, -60),
-Position = UDim2.fromOffset(0, 60),
+Size = UDim2.new(1, 0, 1, -64),
+Position = UDim2.fromOffset(0, 64),
 BackgroundColor3 = C.Black,
 BorderSizePixel = 0,
 ZIndex = 14,
 }, Main)
 
-local PageOrder = {
-"Combat",
-"Visuals",
-"Player",
-"Game",
-"Settings",
-}
-
-for _, pageName in ipairs(PageOrder) do
+for _, tabName in ipairs(Tabs) do
 
 local Page = Create("ScrollingFrame", {
-Name = pageName,
+Name = tabName,
 BackgroundTransparency = 1,
-Size = UDim2.new(1, -8, 1, -8),
-Position = UDim2.fromOffset(4, 4),
+Size = UDim2.new(1, -16, 1, -10),
+Position = UDim2.fromOffset(8, 5),
 
 CanvasSize = UDim2.fromOffset(0, 0),
 AutomaticCanvasSize = Enum.AutomaticSize.Y,
@@ -562,7 +565,7 @@ Visible = false,
 ZIndex = 16,
 }, Content)
 
-Pages[pageName] = Page
+Pages[tabName] = Page
 end
 
 --==================================================
@@ -571,27 +574,25 @@ end
 
 local function SelectTab(tabName)
 
-local targetPageName = TabPageMap[tabName] or tabName
-
 for name, button in pairs(TabButtons) do
 local selected = name == tabName
 
-Tween(button, TweenInfo.new(0.12), {
-BackgroundColor3 = C.Panel,
-TextColor3 = selected and C.Accent or C.Muted,
+Tween(button, TweenInfo.new(0.16), {
+BackgroundColor3 = selected and C.AccentDark or C.Panel,
+TextColor3 = selected and C.White or C.Muted,
 })
 
 local indicator = button:FindFirstChild("Indicator")
 
 if indicator then
-Tween(indicator, TweenInfo.new(0.12), {
+Tween(indicator, TweenInfo.new(0.16), {
 BackgroundTransparency = selected and 0 or 1,
 })
 end
 end
 
 for name, page in pairs(Pages) do
-page.Visible = (name == targetPageName)
+page.Visible = name == tabName
 end
 
 end
@@ -603,37 +604,46 @@ Name = tabName,
 BackgroundColor3 = C.Panel,
 Text = tabName,
 Font = Enum.Font.Code,
-TextSize = 9,
+TextSize = 10,
 TextColor3 = C.Muted,
 
 AutoButtonColor = false,
 
-Size = UDim2.fromOffset(tabName == "Player List" and 92 or 74, 30),
+Size = UDim2.fromOffset(82, 26),
 
 LayoutOrder = index,
 ZIndex = 41,
 }, TabContainer)
+
+Round(button, 2)
 
 local indicator = Create("Frame", {
 Name = "Indicator",
 BackgroundColor3 = C.Accent,
 BackgroundTransparency = 1,
 BorderSizePixel = 0,
-Size = UDim2.new(1, -8, 0, 1),
-Position = UDim2.new(0, 4, 1, -1),
+Size = UDim2.new(1, 0, 0, 2),
+Position = UDim2.new(0, 0, 1, -2),
 ZIndex = 43,
 }, button)
 
 button.MouseEnter:Connect(function()
-Tween(button, TweenInfo.new(0.1), {TextColor3 = C.Accent})
+if button.BackgroundColor3 ~= C.AccentDark then
+Tween(button, TweenInfo.new(0.12), {
+BackgroundColor3 = C.Panel2,
+TextColor3 = C.White,
+})
+end
+
 PlayHover()
 end)
 
 button.MouseLeave:Connect(function()
-local targetPageName = TabPageMap[tabName] or tabName
-local isSelected = Pages[targetPageName] and Pages[targetPageName].Visible
-if not isSelected then
-Tween(button, TweenInfo.new(0.1), {TextColor3 = C.Muted})
+if Pages[tabName].Visible == false then
+Tween(button, TweenInfo.new(0.12), {
+BackgroundColor3 = C.Panel,
+TextColor3 = C.Muted,
+})
 end
 end)
 
@@ -789,11 +799,11 @@ local function SetState(value)
 state = value
 
 Tween(toggle, TweenInfo.new(0.14), {
-BackgroundColor3 = state and C.White or C.Panel3,
+BackgroundColor3 = state and C.Accent or C.Panel3,
 })
 
 Tween(label, TweenInfo.new(0.14), {
-TextColor3 = state and C.White or C.White,
+TextColor3 = C.White,
 })
 
 callback(state)
@@ -846,7 +856,7 @@ Position = UDim2.new(1, -80, 0.5, -16),
 ZIndex = 35,
 }, parent)
 
-Round(box, 7)
+Round(box, 2)
 Stroke(box, C.Border, 0, 1)
 
 local currentValue = value
@@ -890,17 +900,17 @@ ZIndex = 31,
 Stroke(track, C.Border, 0, 1)
 
 local fill = Create("Frame", {
-BackgroundColor3 = C.White,
+BackgroundColor3 = C.Accent,
 BorderSizePixel = 0,
 Size = UDim2.new(0, 0, 1, 0),
 ZIndex = 32,
 }, track)
 
-Stroke(fill, C.White, 0, 1)
+Stroke(fill, C.Accent, 0, 1)
 
 -- Real square drag handle. No UICorner.
 local handle = Create("TextButton", {
-BackgroundColor3 = C.White,
+BackgroundColor3 = C.Accent,
 BorderSizePixel = 0,
 Text = "",
 AutoButtonColor = false,
@@ -1504,7 +1514,7 @@ Position = UDim2.new(1, -47, 0.5, -12),
 ZIndex = 50,
 }, parent)
 
-Round(button, 5)
+Round(button, 2)
 Stroke(button, C.Border, 0, 1)
 
 local popup = Create("Frame", {
@@ -1516,7 +1526,7 @@ Visible = false,
 ZIndex = 100,
 }, parent)
 
-Round(popup, 7)
+Round(popup, 2)
 Stroke(popup, C.Border, 0, 1)
 
 local saturation = Create("ImageLabel", {
@@ -2878,8 +2888,8 @@ FullscreenButton.MouseButton1Click:Connect(function()
 PlayClick()
 Maximized = not Maximized
 if Maximized then
-Main.Size = UDim2.new(1, 0, 1, -38)
-Main.Position = UDim2.fromOffset(0, 38)
+Main.Size = UDim2.new(0.90, 0, 0.90, 0)
+Main.Position = UDim2.new(0.05, 0, 0.05, 0)
 else
 Main.Size = NormalSize
 Main.Position = NormalPosition
@@ -3320,25 +3330,7 @@ end)
 RefreshConfigList()
 
 --==================================================
--- PLAYER LIST PAGE
---==================================================
-
-Pages["Player List"] = Create("ScrollingFrame", {
-    Name = "PlayerList",
-    BackgroundTransparency = 1,
-    Size = UDim2.new(1, -8, 1, -8),
-    Position = UDim2.fromOffset(4, 4),
-    CanvasSize = UDim2.fromOffset(0, 0),
-    AutomaticCanvasSize = Enum.AutomaticSize.None,
-    ScrollBarThickness = 1,
-    ScrollBarImageColor3 = C.Accent,
-    BorderSizePixel = 0,
-    Visible = false,
-    ZIndex = 16,
-}, Content)
-
---==================================================
--- MATCHA REFERENCE TWO-COLUMN LAYOUT
+-- REFERENCE TWO-COLUMN LAYOUT
 --==================================================
 
 local function BuildReferenceColumns()
@@ -3346,145 +3338,67 @@ local function BuildReferenceColumns()
         Combat = 445,
         Visuals = 405,
         Player = 455,
-        Game = 280,
+        Game = math.huge,
         Settings = 435,
     }
 
     for pageName, page in pairs(Pages) do
-        if pageName ~= "Player List" then
-            local threshold = thresholds[pageName] or math.huge
+        local threshold = thresholds[pageName] or math.huge
 
-            local divider = Create("Frame", {
-                Name = "ColumnDivider",
-                BackgroundColor3 = C.Border,
-                BorderSizePixel = 0,
-                Size = UDim2.new(0, 1, 1, 0),
-                Position = UDim2.new(0.5, 0, 0, 0),
-                ZIndex = 3,
-            }, page)
-
-            local left = Create("Frame", {
-                Name = "LeftColumn",
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-                Size = UDim2.new(0.5, -8, 0, 0),
-                Position = UDim2.fromOffset(4, 2),
-                ZIndex = 2,
-            }, page)
-
-            local right = Create("Frame", {
-                Name = "RightColumn",
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-                Size = UDim2.new(0.5, -8, 0, 0),
-                Position = UDim2.new(0.5, 4, 0, 2),
-                ZIndex = 2,
-            }, page)
-
-            local items = {}
-            for _, child in ipairs(page:GetChildren()) do
-                if child:IsA("GuiObject") and child ~= divider and child ~= left and child ~= right then
-                    if child:GetAttribute("FlisiumPageHeader") then
-                        child.Visible = false
-                    else
-                        table.insert(items, child)
-                    end
-                end
-            end
-
-            table.sort(items, function(a, b)
-                return a.Position.Y.Offset < b.Position.Y.Offset
-            end)
-
-            local leftY, rightY = 4, 4
-            local leftMax, rightMax = 0, 0
-
-            for _, child in ipairs(items) do
-                local originalY = child.Position.Y.Offset
-                local useRight = originalY >= threshold
-                local column = useRight and right or left
-                local y = useRight and rightY or leftY
-                local height = child.Size.Y.Offset
-                if height <= 0 then height = 28 end
-
-                child.Parent = column
-                child.Position = UDim2.fromOffset(0, y)
-                child.Size = UDim2.new(1, -2, child.Size.Y.Scale, child.Size.Y.Offset)
-                child.ZIndex = math.max(child.ZIndex, 4)
-
-                if useRight then
-                    rightY = y + height + 8
-                    rightMax = math.max(rightMax, rightY)
-                else
-                    leftY = y + height + 8
-                    leftMax = math.max(leftMax, leftY)
-                end
-            end
-
-            local columnHeight = math.max(leftMax, rightMax, 10)
-            left.Size = UDim2.new(0.5, -8, 0, columnHeight)
-            right.Size = UDim2.new(0.5, -8, 0, columnHeight)
-            page.CanvasSize = UDim2.fromOffset(0, columnHeight + 8)
-            page.AutomaticCanvasSize = Enum.AutomaticSize.None
-        end
-    end
-
-    -- Player List is intentionally a compact reference-style table.
-    local playerPage = Pages["Player List"]
-    if playerPage then
-        local header = Create("TextLabel", {
-            BackgroundTransparency = 1,
-            Text = "Players",
-            Font = Enum.Font.Code,
-            TextSize = 11,
-            TextColor3 = C.White,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            Size = UDim2.new(1, -12, 0, 24),
-            Position = UDim2.fromOffset(6, 4),
-            ZIndex = 4,
-        }, playerPage)
-
-        local list = Create("Frame", {
-            BackgroundColor3 = C.Panel2,
+        -- Two subtle panels behind the feature columns.
+        local divider = Create("Frame", {
+            Name = "ColumnDivider",
+            BackgroundColor3 = C.Border,
             BorderSizePixel = 0,
-            Size = UDim2.new(1, -12, 0, 0),
-            Position = UDim2.fromOffset(6, 32),
-            ZIndex = 4,
-        }, playerPage)
-        Stroke(list, C.Border, 0, 1)
+            Size = UDim2.new(0, 1, 1, -8),
+            Position = UDim2.new(0.5, 0, 0, 4),
+            ZIndex = 1,
+        }, page)
 
-        local layout = Create("UIListLayout", {
-            Padding = UDim.new(0, 1),
-            SortOrder = Enum.SortOrder.LayoutOrder,
-        }, list)
+        local left = Create("Frame", {
+            Name = "LeftColumn",
+            BackgroundColor3 = C.Panel,
+            BackgroundTransparency = 0.18,
+            BorderSizePixel = 0,
+            Size = UDim2.new(0.5, -6, 1, -8),
+            Position = UDim2.fromOffset(0, 4),
+            ZIndex = 0,
+        }, page)
+        local right = Create("Frame", {
+            Name = "RightColumn",
+            BackgroundColor3 = C.Panel,
+            BackgroundTransparency = 0.18,
+            BorderSizePixel = 0,
+            Size = UDim2.new(0.5, -6, 1, -8),
+            Position = UDim2.new(0.5, 6, 0, 4),
+            ZIndex = 0,
+        }, page)
+        Stroke(left, C.Border, 0.65, 1)
+        Stroke(right, C.Border, 0.65, 1)
 
-        local function refreshPlayerList()
-            for _, child in ipairs(list:GetChildren()) do
-                if child:IsA("TextLabel") then child:Destroy() end
+        for _, child in ipairs(page:GetChildren()) do
+            if child:IsA("GuiObject") and child ~= divider and child ~= left and child ~= right then
+                local y = child.Position.Y.Offset
+                local isHeader = y < 70
+                if isHeader then
+                    child.Size = UDim2.new(1, -10, child.Size.Y.Scale, child.Size.Y.Offset)
+                    child.Position = UDim2.fromOffset(5, math.max(2, y))
+                else
+                    local rightSide = (y >= threshold)
+                    local newX = rightSide and (page.AbsoluteSize.X * 0.5 + 6) or 5
+                    local newY = rightSide and (y - threshold + 70) or y
+                    child.Position = UDim2.new(rightSide and 0.5 or 0, rightSide and 6 or 5, 0, newY)
+                    child.Size = UDim2.new(0.5, -16, child.Size.Y.Scale, child.Size.Y.Offset)
+                end
             end
-            local players = Players:GetPlayers()
-            table.sort(players, function(a, b) return a.Name:lower() < b.Name:lower() end)
-            for i, player in ipairs(players) do
-                Create("TextLabel", {
-                    BackgroundColor3 = (i % 2 == 0) and C.Panel or C.Panel2,
-                    BorderSizePixel = 0,
-                    Text = "  " .. player.DisplayName .. "  @" .. player.Name,
-                    Font = Enum.Font.Code,
-                    TextSize = 9,
-                    TextColor3 = player == LocalPlayer and C.Accent or C.White,
-                    TextXAlignment = Enum.TextXAlignment.Left,
-                    Size = UDim2.new(1, -2, 0, 25),
-                    LayoutOrder = i,
-                    ZIndex = 5,
-                }, list)
-            end
-            list.Size = UDim2.new(1, -12, 0, math.max(25, #players * 26))
-            playerPage.CanvasSize = UDim2.fromOffset(0, list.AbsolutePosition.Y - playerPage.AbsolutePosition.Y + list.AbsoluteSize.Y + 10)
         end
 
-        refreshPlayerList()
-        Players.PlayerAdded:Connect(refreshPlayerList)
-        Players.PlayerRemoving:Connect(refreshPlayerList)
+        -- Recreate header width after columns are in place.
+        for _, child in ipairs(page:GetChildren()) do
+            if child:IsA("Frame") and child.Name == "ColumnDivider" then
+                child.ZIndex = 2
+            end
+        end
     end
 end
 
@@ -3540,7 +3454,7 @@ Maximized = false
 Content.Visible = true
 Main.BackgroundTransparency = 0
 Main.Size = NormalSize
-Main.Position = NormalPosition
+Main.Position = Maximized and UDim2.new(0.07, 0, 0.07, 0) or NormalPosition
 if ClockEnabled then ShowClock() end
 else
 Minimized = true
@@ -3558,7 +3472,7 @@ if Maximized then
 Main.AnchorPoint = Vector2.new(0, 0)
 Tween(Main, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
 Size = UDim2.new(0.90, 0, 0.90, 0),
-Position = UDim2.fromOffset(0, 38),
+Position = UDim2.new(0.05, 0, 0.05, 0),
 })
 else
 Tween(Main, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
@@ -3680,22 +3594,19 @@ end)
 -- CLOCK UPDATE
 --==================================================
 
-local months = {"January","February","March","April","May","June","July","August","September","October","November","December"}
-local ClockFPS = 60
-
-RunService.RenderStepped:Connect(function(dt)
-    if dt > 0 then
-        ClockFPS = math.clamp(math.floor((1 / dt) + 0.5), 1, 999)
-    end
-end)
-
 task.spawn(function()
 
 while Gui.Parent do
 
 local now = DateTime.now():ToLocalTime()
 
-ClockText.Text = string.format(".%03d fps  •  %s, %d, %d", ClockFPS, months[now.Month], now.Day, now.Year)
+ClockText.Text =
+string.format(
+"%02d:%02d:%02d",
+now.Hour,
+now.Minute,
+now.Second
+)
 
 task.wait(1)
 end
@@ -3705,14 +3616,18 @@ end)
 -- AMBIENT UI VFX
 --==================================================
 
-MainStroke.Color = C.Border
-MainStroke.Thickness = 1
+task.spawn(function()
+    while Main.Parent do
+        Tween(MainStroke, TweenInfo.new(1.4, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Thickness = 1.8, Color = C.Accent}).Completed:Wait()
+        Tween(MainStroke, TweenInfo.new(1.4, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Thickness = 1, Color = C.Border}).Completed:Wait()
+    end
+end)
 
 --==================================================
 -- INITIAL STATE
 --==================================================
 
-SelectTab("Misc")
+SelectTab("Player")
 UpdateFOVCircle()
 ShowClock()
 
