@@ -27,11 +27,11 @@ ClickSound = "rbxassetid://116080744084010",
 HoverSound = "rbxassetid://139800881181209",
 CloseSound = "rbxassetid://8968249849",
 
-Width = 760,
-Height = 560,
+Width = 900,
+Height = 620,
 
-MinWidth = 620,
-MinHeight = 420,
+MinWidth = 700,
+MinHeight = 480,
 }
 
 --==================================================
@@ -85,8 +85,7 @@ end
 
 local function Round(object, radius)
 local corner = Instance.new("UICorner")
-local finalRadius = (radius >= 100) and radius or 2
-corner.CornerRadius = UDim.new(0, finalRadius)
+corner.CornerRadius = UDim.new(0, radius)
 corner.Parent = object
 return corner
 end
@@ -180,7 +179,7 @@ BorderSizePixel = 0,
 ClipsDescendants = true,
 }, Gui)
 
-Round(Main, 2)
+Round(Main, 10)
 local MainStroke = Stroke(Main, C.Border, 0, 1)
 
 -- Shadow
@@ -237,7 +236,7 @@ end)
 
 local Header = Create("Frame", {
 Name = "Header",
-Size = UDim2.new(1, 0, 0, 36),
+Size = UDim2.new(1, 0, 0, 42),
 BackgroundColor3 = C.Panel,
 BorderSizePixel = 0,
 ZIndex = 20,
@@ -252,7 +251,7 @@ Position = UDim2.fromOffset(10, 9),
 ZIndex = 22,
 }, Header)
 
-Round(Logo, 2)
+Round(Logo, 7)
 
 local Title = Create("TextLabel", {
 BackgroundTransparency = 1,
@@ -296,7 +295,7 @@ Position = position,
 ZIndex = 25,
 }, Header)
 
-Round(button, 2)
+Round(button, 6)
 
 Stroke(button, C.Border, 0.2, 1)
 
@@ -485,39 +484,72 @@ UDim2.new(0, 8, 1, -8)
 )
 
 --==================================================
--- SIDEBAR
+-- SIDEBAR / VERTICAL NAVIGATION
 --==================================================
+
+local SIDEBAR_WIDTH = 156
 
 local Sidebar = Create("Frame", {
 Name = "Sidebar",
-Size = UDim2.fromOffset(0, 0),
-Position = UDim2.fromOffset(0, 0),
-BackgroundTransparency = 1,
+Size = UDim2.new(0, SIDEBAR_WIDTH, 1, -42),
+Position = UDim2.fromOffset(0, 42),
+BackgroundColor3 = C.Panel,
 BorderSizePixel = 0,
-Visible = false,
-ZIndex = 1,
+Visible = true,
+ZIndex = 15,
 }, Main)
+Round(Sidebar, 10)
+Stroke(Sidebar, C.Border, 0.15, 1)
+
+local SidebarMask = Create("Frame", {
+BackgroundColor3 = C.Panel,
+BorderSizePixel = 0,
+Size = UDim2.new(1, 0, 0, 18),
+Position = UDim2.fromOffset(0, -1),
+ZIndex = 16,
+}, Sidebar)
 
 local SidebarLine = Create("Frame", {
-Size = UDim2.fromOffset(1, CONFIG.Height - 64),
+Size = UDim2.fromOffset(1, CONFIG.Height - 50),
 Position = UDim2.new(1, -1, 0, 0),
 BackgroundColor3 = C.Border,
 BorderSizePixel = 0,
 ZIndex = 18,
 }, Sidebar)
 
+local NavTitle = Create("TextLabel", {
+BackgroundTransparency = 1,
+Text = "NAVIGATION",
+Font = Enum.Font.Code,
+TextSize = 9,
+TextColor3 = C.Dim,
+TextXAlignment = Enum.TextXAlignment.Left,
+Size = UDim2.new(1, -24, 0, 18),
+Position = UDim2.fromOffset(12, 16),
+ZIndex = 20,
+}, Sidebar)
+
+local NavAccent = Create("Frame", {
+BackgroundColor3 = C.Accent,
+BorderSizePixel = 0,
+Size = UDim2.fromOffset(24, 2),
+Position = UDim2.fromOffset(12, 35),
+ZIndex = 20,
+}, Sidebar)
+Round(NavAccent, 2)
+
 local TabContainer = Create("Frame", {
 BackgroundTransparency = 1,
-Size = UDim2.new(1, -16, 0, 28),
-Position = UDim2.fromOffset(8, 36),
+Size = UDim2.new(1, -16, 0, 210),
+Position = UDim2.fromOffset(8, 50),
 ZIndex = 40,
-}, Main)
+}, Sidebar)
 
 Create("UIListLayout", {
-Padding = UDim.new(0, 2),
-FillDirection = Enum.FillDirection.Horizontal,
-HorizontalAlignment = Enum.HorizontalAlignment.Left,
-VerticalAlignment = Enum.VerticalAlignment.Center,
+Padding = UDim.new(0, 6),
+FillDirection = Enum.FillDirection.Vertical,
+HorizontalAlignment = Enum.HorizontalAlignment.Center,
+VerticalAlignment = Enum.VerticalAlignment.Top,
 SortOrder = Enum.SortOrder.LayoutOrder,
 }, TabContainer)
 
@@ -538,28 +570,36 @@ local Pages = {}
 
 local Content = Create("Frame", {
 Name = "Content",
-Size = UDim2.new(1, 0, 1, -64),
-Position = UDim2.fromOffset(0, 64),
+Size = UDim2.new(1, -SIDEBAR_WIDTH - 10, 1, -52),
+Position = UDim2.fromOffset(SIDEBAR_WIDTH + 5, 47),
 BackgroundColor3 = C.Black,
 BorderSizePixel = 0,
 ZIndex = 14,
 }, Main)
+Round(Content, 10)
+Stroke(Content, C.Border, 0.35, 1)
+
+-- Subtle top accent line for the content surface.
+local ContentAccent = Create("Frame", {
+BackgroundColor3 = C.Accent,
+BorderSizePixel = 0,
+Size = UDim2.new(1, -24, 0, 1),
+Position = UDim2.fromOffset(12, 0),
+ZIndex = 18,
+}, Content)
+Round(ContentAccent, 2)
 
 for _, tabName in ipairs(Tabs) do
-
 local Page = Create("ScrollingFrame", {
 Name = tabName,
 BackgroundTransparency = 1,
 Size = UDim2.new(1, -16, 1, -10),
 Position = UDim2.fromOffset(8, 5),
-
 CanvasSize = UDim2.fromOffset(0, 0),
 AutomaticCanvasSize = Enum.AutomaticSize.Y,
-
-ScrollBarThickness = 1,
+ScrollBarThickness = 2,
 ScrollBarImageColor3 = C.Accent,
-ScrollBarImageTransparency = 0.25,
-
+ScrollBarImageTransparency = 0.15,
 BorderSizePixel = 0,
 Visible = false,
 ZIndex = 16,
@@ -573,77 +613,110 @@ end
 --==================================================
 
 local function SelectTab(tabName)
-
 for name, button in pairs(TabButtons) do
 local selected = name == tabName
 
-Tween(button, TweenInfo.new(0.16), {
-BackgroundColor3 = selected and C.AccentDark or C.Panel,
+Tween(button, TweenInfo.new(0.18, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+BackgroundColor3 = selected and C.AccentDark or C.Panel2,
 TextColor3 = selected and C.White or C.Muted,
 })
 
 local indicator = button:FindFirstChild("Indicator")
+local icon = button:FindFirstChild("NavIcon")
 
 if indicator then
-Tween(indicator, TweenInfo.new(0.16), {
+Tween(indicator, TweenInfo.new(0.18, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
 BackgroundTransparency = selected and 0 or 1,
+Size = selected and UDim2.fromOffset(3, 22) or UDim2.fromOffset(3, 8),
+})
+end
+
+if icon then
+Tween(icon, TweenInfo.new(0.18), {
+TextColor3 = selected and C.White or C.Muted,
 })
 end
 end
-
-for name, page in pairs(Pages) do
-page.Visible = name == tabName
-end
-
 end
 
 for index, tabName in ipairs(Tabs) do
-
 local button = Create("TextButton", {
 Name = tabName,
-BackgroundColor3 = C.Panel,
-Text = tabName,
-Font = Enum.Font.Code,
-TextSize = 10,
-TextColor3 = C.Muted,
-
+BackgroundColor3 = C.Panel2,
+Text = "",
 AutoButtonColor = false,
-
-Size = UDim2.fromOffset(82, 26),
-
+Size = UDim2.new(1, 0, 0, 36),
 LayoutOrder = index,
 ZIndex = 41,
 }, TabContainer)
 
-Round(button, 2)
+Round(button, 8)
+Stroke(button, C.Border, 0.45, 1)
+
+local iconLetters = {
+Combat = "C",
+Visuals = "V",
+Player = "P",
+Game = "G",
+Settings = "S",
+}
+
+local icon = Create("TextLabel", {
+Name = "NavIcon",
+BackgroundTransparency = 1,
+Text = iconLetters[tabName] or "?",
+Font = Enum.Font.Code,
+TextSize = 11,
+TextColor3 = C.Muted,
+TextXAlignment = Enum.TextXAlignment.Center,
+Size = UDim2.fromOffset(28, 28),
+Position = UDim2.fromOffset(7, 4),
+ZIndex = 43,
+}, button)
+
+local label = Create("TextLabel", {
+BackgroundTransparency = 1,
+Text = tabName,
+Font = Enum.Font.Code,
+TextSize = 10,
+TextColor3 = C.Muted,
+TextXAlignment = Enum.TextXAlignment.Left,
+Size = UDim2.new(1, -52, 1, 0),
+Position = UDim2.fromOffset(43, 0),
+ZIndex = 43,
+}, button)
 
 local indicator = Create("Frame", {
 Name = "Indicator",
 BackgroundColor3 = C.Accent,
 BackgroundTransparency = 1,
 BorderSizePixel = 0,
-Size = UDim2.new(1, 0, 0, 2),
-Position = UDim2.new(0, 0, 1, -2),
-ZIndex = 43,
+Size = UDim2.fromOffset(3, 8),
+Position = UDim2.new(1, -5, 0.5, -11),
+ZIndex = 44,
 }, button)
+Round(indicator, 2)
 
 button.MouseEnter:Connect(function()
-if button.BackgroundColor3 ~= C.AccentDark then
+if Pages[tabName].Visible == false then
 Tween(button, TweenInfo.new(0.12), {
-BackgroundColor3 = C.Panel2,
+BackgroundColor3 = C.Panel3,
 TextColor3 = C.White,
 })
+Tween(label, TweenInfo.new(0.12), {TextColor3 = C.White})
+Tween(icon, TweenInfo.new(0.12), {TextColor3 = C.Accent})
 end
-
 PlayHover()
 end)
 
 button.MouseLeave:Connect(function()
 if Pages[tabName].Visible == false then
 Tween(button, TweenInfo.new(0.12), {
-BackgroundColor3 = C.Panel,
+BackgroundColor3 = C.Panel2,
 TextColor3 = C.Muted,
 })
+Tween(label, TweenInfo.new(0.12), {TextColor3 = C.Muted})
+Tween(icon, TweenInfo.new(0.12), {TextColor3 = C.Muted})
 end
 end)
 
@@ -661,8 +734,8 @@ end
 
 local Status = Create("Frame", {
 BackgroundTransparency = 1,
-Size = UDim2.new(1, -20, 0, 45),
-Position = UDim2.new(0, 10, 1, -60),
+Size = UDim2.new(1, -20, 0, 48),
+Position = UDim2.new(0, 10, 1, -62),
 ZIndex = 20,
 }, Sidebar)
 
@@ -716,7 +789,7 @@ Create("TextLabel", {
 BackgroundTransparency = 1,
 Text = title,
 Font = Enum.Font.Code,
-TextSize = 16,
+TextSize = 18,
 TextColor3 = C.White,
 TextXAlignment = Enum.TextXAlignment.Left,
 Size = UDim2.new(1, 0, 0, 22),
@@ -731,7 +804,7 @@ TextSize = 10,
 TextColor3 = C.Muted,
 TextXAlignment = Enum.TextXAlignment.Left,
 Size = UDim2.new(1, 0, 0, 15),
-Position = UDim2.fromOffset(0, 23),
+Position = UDim2.fromOffset(0, 25),
 }, holder)
 
 return holder
@@ -856,7 +929,7 @@ Position = UDim2.new(1, -80, 0.5, -16),
 ZIndex = 35,
 }, parent)
 
-Round(box, 2)
+Round(box, 7)
 Stroke(box, C.Border, 0, 1)
 
 local currentValue = value
@@ -1002,6 +1075,45 @@ Get = function()
 return current
 end,
 }
+end
+
+--==================================================
+-- MICRO INTERACTION POLISH
+--==================================================
+
+local function PolishButton(button)
+    if not button or not button:IsA("GuiButton") then
+        return
+    end
+
+    if not button:GetAttribute("FlisiumPolished") then
+        button:SetAttribute("FlisiumPolished", true)
+
+        local stroke = button:FindFirstChildOfClass("UIStroke")
+        if not stroke then
+            stroke = Stroke(button, C.Border, 0.35, 1)
+        end
+
+        button.MouseEnter:Connect(function()
+            Tween(button, TweenInfo.new(0.14, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                BackgroundColor3 = C.Panel3,
+            })
+            Tween(stroke, TweenInfo.new(0.14), {
+                Color = C.Accent,
+                Transparency = 0.05,
+            })
+        end)
+
+        button.MouseLeave:Connect(function()
+            Tween(button, TweenInfo.new(0.16, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                BackgroundColor3 = C.Panel2,
+            })
+            Tween(stroke, TweenInfo.new(0.16), {
+                Color = C.Border,
+                Transparency = 0.35,
+            })
+        end)
+    end
 end
 
 --==================================================
@@ -1514,7 +1626,7 @@ Position = UDim2.new(1, -47, 0.5, -12),
 ZIndex = 50,
 }, parent)
 
-Round(button, 2)
+Round(button, 6)
 Stroke(button, C.Border, 0, 1)
 
 local popup = Create("Frame", {
@@ -1526,7 +1638,7 @@ Visible = false,
 ZIndex = 100,
 }, parent)
 
-Round(popup, 2)
+Round(popup, 8)
 Stroke(popup, C.Border, 0, 1)
 
 local saturation = Create("ImageLabel", {
@@ -3622,6 +3734,29 @@ task.spawn(function()
         Tween(MainStroke, TweenInfo.new(1.4, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Thickness = 1, Color = C.Border}).Completed:Wait()
     end
 end)
+
+--==================================================
+-- FINAL UI POLISH PASS
+--==================================================
+
+for _, object in ipairs(Main:GetDescendants()) do
+    if object:IsA("TextButton") or object:IsA("ImageButton") then
+        PolishButton(object)
+    end
+end
+
+-- Keep the most important surfaces consistently rounded.
+for _, object in ipairs(Main:GetDescendants()) do
+    if object:IsA("Frame") or object:IsA("TextButton") or object:IsA("TextBox") then
+        if object.BackgroundTransparency < 1 and not object:FindFirstChildOfClass("UICorner") then
+            local width = object.AbsoluteSize.X
+            local height = object.AbsoluteSize.Y
+            if width > 120 and height >= 28 and height <= 110 then
+                Round(object, 7)
+            end
+        end
+    end
+end
 
 --==================================================
 -- INITIAL STATE
